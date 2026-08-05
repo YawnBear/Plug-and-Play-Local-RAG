@@ -77,25 +77,27 @@ describe("PDF citation highlight resolution", () => {
     expect(rectangles).toEqual([{ x: 90, y: 100, width: 10, height: 40 }]);
   });
 
-  it.each([0, 90, 180, 270])(
+  it.each([
+    [0, { x: 10, y: 80, width: 30, height: 80 }],
+    [90, { x: 80, y: 10, width: 80, height: 30 }],
+    [180, { x: 60, y: 40, width: 30, height: 80 }],
+    [270, { x: 40, y: 60, width: 80, height: 30 }],
+  ])(
     "maps OCR regions through the active %i-degree viewport",
-    (rotation) => {
-      const convertToViewportRectangle = (rect: readonly number[]) => {
-        const [x1, y1, x2, y2] = rect;
-        if (rotation === 90) return [y1, x1, y2, x2];
-        if (rotation === 180) return [100 - x1, 200 - y1, 100 - x2, 200 - y2];
-        if (rotation === 270) return [200 - y1, 100 - x1, 200 - y2, 100 - x2];
-        return rect;
+    (rotation, expected) => {
+      const convertToViewportPoint = (x: number, y: number) => {
+        if (rotation === 90) return [y, x];
+        if (rotation === 180) return [100 - x, 200 - y];
+        if (rotation === 270) return [200 - y, 100 - x];
+        return [x, y];
       };
       const result = ocrRegionRectangles(
         [{ x: 0.1, y: 0.2, width: 0.3, height: 0.4 }],
         [0, 0, 100, 200],
-        { convertToViewportRectangle },
+        { convertToViewportPoint },
       );
 
-      expect(result).toHaveLength(1);
-      expect(result[0].width).toBeGreaterThan(0);
-      expect(result[0].height).toBeGreaterThan(0);
+      expect(result).toEqual([expected]);
     },
   );
 });

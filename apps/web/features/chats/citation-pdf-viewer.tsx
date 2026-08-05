@@ -37,7 +37,6 @@ export function CitationPdfViewer({
   useEffect(() => {
     let active = true;
     let loadingTask: { destroy(): Promise<void> } | null = null;
-    let document: { destroy(): Promise<void> } | null = null;
     let renderTask: { cancel(): void; promise: Promise<void> } | null = null;
     const run = async (): Promise<void> => {
       setStatus("loading");
@@ -52,11 +51,9 @@ export function CitationPdfViewer({
           url: documentContentUrl(evidence.document_id),
           withCredentials: true,
           useWasm: false,
-          isEvalSupported: false,
         });
         loadingTask = task;
         const loaded = await task.promise;
-        document = loaded;
         const page = await loaded.getPage(pageNumber);
         const base = page.getViewport({ scale: 1 });
         const available = Math.max(containerRef.current?.clientWidth ?? 420, 280);
@@ -121,7 +118,6 @@ export function CitationPdfViewer({
     return () => {
       active = false;
       renderTask?.cancel();
-      void document?.destroy();
       void loadingTask?.destroy();
     };
   }, [anchorPage, evidence.document_id, pageNumber, retry]);

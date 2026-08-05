@@ -129,25 +129,32 @@ export function ocrRegionRectangles(
   regions: readonly { x: number; y: number; width: number; height: number }[],
   pageView: readonly number[],
   viewport: {
-    convertToViewportRectangle(rect: readonly number[]): readonly number[];
+    convertToViewportPoint(x: number, y: number): readonly number[];
   },
 ): OverlayRect[] {
   const [left, bottom, right, top] = pageView;
   const pageWidth = right - left;
   const pageHeight = top - bottom;
   return regions.map((region) => {
-    const converted = viewport.convertToViewportRectangle([
-      left + region.x * pageWidth,
-      bottom + (1 - region.y - region.height) * pageHeight,
-      left + (region.x + region.width) * pageWidth,
-      bottom + (1 - region.y) * pageHeight,
-    ]);
-    const [x1, y1, x2, y2] = converted;
+    const regionLeft = left + region.x * pageWidth;
+    const regionBottom = bottom + (1 - region.y - region.height) * pageHeight;
+    const regionRight = left + (region.x + region.width) * pageWidth;
+    const regionTop = bottom + (1 - region.y) * pageHeight;
+    const converted = [
+      viewport.convertToViewportPoint(regionLeft, regionBottom),
+      viewport.convertToViewportPoint(regionRight, regionBottom),
+      viewport.convertToViewportPoint(regionLeft, regionTop),
+      viewport.convertToViewportPoint(regionRight, regionTop),
+    ];
+    const xValues = converted.map(([x]) => x);
+    const yValues = converted.map(([, y]) => y);
+    const convertedLeft = Math.min(...xValues);
+    const convertedTop = Math.min(...yValues);
     return {
-      x: Math.min(x1, x2),
-      y: Math.min(y1, y2),
-      width: Math.abs(x2 - x1),
-      height: Math.abs(y2 - y1),
+      x: convertedLeft,
+      y: convertedTop,
+      width: Math.max(...xValues) - convertedLeft,
+      height: Math.max(...yValues) - convertedTop,
     };
   });
 }
