@@ -9,6 +9,12 @@ on the operator's PC or private LAN deployment.
 This repository is the public source distribution. The optional signed Personal
 installer bundle is separate and is not included in the source release.
 
+**[Open the interactive frontend preview](https://yawnbear.github.io/Plug-and-Play-Local-RAG/)**
+
+The preview uses fictional sample documents and runs entirely in the browser.
+It demonstrates chat, citations, the Knowledge Base, system status, responsive
+layout, and light/dark themes without connecting to a backend or uploading data.
+
 ## 1. Normal users
 
 The easiest source-based installation is the included Windows setup launcher.

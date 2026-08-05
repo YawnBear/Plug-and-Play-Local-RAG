@@ -18,6 +18,7 @@ test-results/
 # next.js
 .next/
 out/
+/preview-dist/
 
 # production
 build/
