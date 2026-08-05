@@ -10,6 +10,7 @@ from uuid import UUID, uuid4
 import pytest
 from pypdf import PdfReader
 
+import app.services.system as system_service_module
 from app.config import Settings
 from app.domain import ParseMethod
 from app.schemas.system import (
@@ -489,7 +490,12 @@ class Controller:
 
 def test_configuration_preview_reauthentication_and_apply_are_digest_bound(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    monkeypatch.setattr(system_service_module.os, "cpu_count", lambda: 16)
+    monkeypatch.setattr(
+        system_service_module, "_system_memory_bytes", lambda: 32 * 1024**3
+    )
     authentication = Authentication()
     controller = Controller()
     system, gateway = service(
