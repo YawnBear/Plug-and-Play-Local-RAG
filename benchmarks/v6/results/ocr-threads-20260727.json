@@ -1,0 +1,354 @@
+{
+  "cold_repetitions": 1,
+  "fixture": {
+    "path": "image-only-scan.pdf",
+    "sha256": "ad090cb0107a751128b38bed33e48a73a0f458913a6eb34d898f3d1cd6e15fc5"
+  },
+  "mixed_workload": {
+    "status": "not_run"
+  },
+  "pipeline_version": "v1.6",
+  "resource_metrics": {
+    "scope": "The PaddleOCR CLI process only. Retain deployment-monitor host metrics for the mixed-workload promotion gate.",
+    "status": "process-cpu-and-peak-working-set-collected"
+  },
+  "schema_version": 1,
+  "settings": [
+    {
+      "cold": {
+        "average_host_cpu_percent": 6.235,
+        "elapsed_seconds": 60.100025,
+        "pages": 1,
+        "peak_working_set_bytes": 9103581184,
+        "process_cpu_seconds": 59.953125,
+        "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+        "result_bytes": 2734
+      },
+      "cpu_threads": 1,
+      "quality_stable": true,
+      "warm": [
+        {
+          "average_host_cpu_percent": 6.207,
+          "elapsed_seconds": 61.312264,
+          "pages": 1,
+          "peak_working_set_bytes": 9102245888,
+          "process_cpu_seconds": 60.890625,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 6.219,
+          "elapsed_seconds": 61.524219,
+          "pages": 1,
+          "peak_working_set_bytes": 9092280320,
+          "process_cpu_seconds": 61.21875,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 6.204,
+          "elapsed_seconds": 61.513841,
+          "pages": 1,
+          "peak_working_set_bytes": 9106010112,
+          "process_cpu_seconds": 61.0625,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 6.228,
+          "elapsed_seconds": 60.919359,
+          "pages": 1,
+          "peak_working_set_bytes": 9103081472,
+          "process_cpu_seconds": 60.703125,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 6.232,
+          "elapsed_seconds": 59.918477,
+          "pages": 1,
+          "peak_working_set_bytes": 9092771840,
+          "process_cpu_seconds": 59.75,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        }
+      ],
+      "warm_elapsed_median_seconds": 61.312264,
+      "warm_elapsed_range_seconds": [
+        59.918477,
+        61.524219
+      ]
+    },
+    {
+      "cold": {
+        "average_host_cpu_percent": 8.248,
+        "elapsed_seconds": 56.490636,
+        "pages": 1,
+        "peak_working_set_bytes": 9102446592,
+        "process_cpu_seconds": 74.546875,
+        "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+        "result_bytes": 2734
+      },
+      "cpu_threads": 8,
+      "quality_stable": true,
+      "warm": [
+        {
+          "average_host_cpu_percent": 8.206,
+          "elapsed_seconds": 57.013601,
+          "pages": 1,
+          "peak_working_set_bytes": 9103155200,
+          "process_cpu_seconds": 74.859375,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.275,
+          "elapsed_seconds": 59.221926,
+          "pages": 1,
+          "peak_working_set_bytes": 9091477504,
+          "process_cpu_seconds": 78.40625,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.396,
+          "elapsed_seconds": 59.51986,
+          "pages": 1,
+          "peak_working_set_bytes": 9092030464,
+          "process_cpu_seconds": 79.953125,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.303,
+          "elapsed_seconds": 58.819315,
+          "pages": 1,
+          "peak_working_set_bytes": 9103790080,
+          "process_cpu_seconds": 78.140625,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.292,
+          "elapsed_seconds": 59.307538,
+          "pages": 1,
+          "peak_working_set_bytes": 9103003648,
+          "process_cpu_seconds": 78.6875,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        }
+      ],
+      "warm_elapsed_median_seconds": 59.221926,
+      "warm_elapsed_range_seconds": [
+        57.013601,
+        59.51986
+      ]
+    },
+    {
+      "cold": {
+        "average_host_cpu_percent": 8.263,
+        "elapsed_seconds": 58.311313,
+        "pages": 1,
+        "peak_working_set_bytes": 9101873152,
+        "process_cpu_seconds": 77.09375,
+        "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+        "result_bytes": 2734
+      },
+      "cpu_threads": 10,
+      "quality_stable": true,
+      "warm": [
+        {
+          "average_host_cpu_percent": 8.273,
+          "elapsed_seconds": 58.11409,
+          "pages": 1,
+          "peak_working_set_bytes": 9103552512,
+          "process_cpu_seconds": 76.921875,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.462,
+          "elapsed_seconds": 58.923264,
+          "pages": 1,
+          "peak_working_set_bytes": 9091981312,
+          "process_cpu_seconds": 79.78125,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.256,
+          "elapsed_seconds": 59.624888,
+          "pages": 1,
+          "peak_working_set_bytes": 9103056896,
+          "process_cpu_seconds": 78.765625,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.259,
+          "elapsed_seconds": 58.613165,
+          "pages": 1,
+          "peak_working_set_bytes": 9090744320,
+          "process_cpu_seconds": 77.453125,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.308,
+          "elapsed_seconds": 58.514431,
+          "pages": 1,
+          "peak_working_set_bytes": 9093476352,
+          "process_cpu_seconds": 77.78125,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        }
+      ],
+      "warm_elapsed_median_seconds": 58.613165,
+      "warm_elapsed_range_seconds": [
+        58.11409,
+        59.624888
+      ]
+    },
+    {
+      "cold": {
+        "average_host_cpu_percent": 8.303,
+        "elapsed_seconds": 57.905549,
+        "pages": 1,
+        "peak_working_set_bytes": 9103052800,
+        "process_cpu_seconds": 76.921875,
+        "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+        "result_bytes": 2734
+      },
+      "cpu_threads": 12,
+      "quality_stable": true,
+      "warm": [
+        {
+          "average_host_cpu_percent": 8.272,
+          "elapsed_seconds": 58.014507,
+          "pages": 1,
+          "peak_working_set_bytes": 9093763072,
+          "process_cpu_seconds": 76.78125,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.241,
+          "elapsed_seconds": 58.315002,
+          "pages": 1,
+          "peak_working_set_bytes": 9103560704,
+          "process_cpu_seconds": 76.890625,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.274,
+          "elapsed_seconds": 57.81117,
+          "pages": 1,
+          "peak_working_set_bytes": 9103425536,
+          "process_cpu_seconds": 76.53125,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.189,
+          "elapsed_seconds": 56.396296,
+          "pages": 1,
+          "peak_working_set_bytes": 9103237120,
+          "process_cpu_seconds": 73.890625,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.212,
+          "elapsed_seconds": 56.499463,
+          "pages": 1,
+          "peak_working_set_bytes": 9103441920,
+          "process_cpu_seconds": 74.234375,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        }
+      ],
+      "warm_elapsed_median_seconds": 57.81117,
+      "warm_elapsed_range_seconds": [
+        56.396296,
+        58.315002
+      ]
+    },
+    {
+      "cold": {
+        "average_host_cpu_percent": 8.154,
+        "elapsed_seconds": 56.191115,
+        "pages": 1,
+        "peak_working_set_bytes": 9106825216,
+        "process_cpu_seconds": 73.3125,
+        "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+        "result_bytes": 2734
+      },
+      "cpu_threads": 16,
+      "quality_stable": true,
+      "warm": [
+        {
+          "average_host_cpu_percent": 8.201,
+          "elapsed_seconds": 56.193157,
+          "pages": 1,
+          "peak_working_set_bytes": 9102888960,
+          "process_cpu_seconds": 73.734375,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.156,
+          "elapsed_seconds": 56.3971,
+          "pages": 1,
+          "peak_working_set_bytes": 9092599808,
+          "process_cpu_seconds": 73.59375,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.228,
+          "elapsed_seconds": 56.400284,
+          "pages": 1,
+          "peak_working_set_bytes": 9093165056,
+          "process_cpu_seconds": 74.25,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.196,
+          "elapsed_seconds": 56.298534,
+          "pages": 1,
+          "peak_working_set_bytes": 9106362368,
+          "process_cpu_seconds": 73.828125,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        },
+        {
+          "average_host_cpu_percent": 8.224,
+          "elapsed_seconds": 56.297952,
+          "pages": 1,
+          "peak_working_set_bytes": 9102938112,
+          "process_cpu_seconds": 74.078125,
+          "quality_sha256": "e62cdfa6b0936643394e0d3874b3a73d0026d8532b7601bbcecbafd88f9ecddf",
+          "result_bytes": 2734
+        }
+      ],
+      "warm_elapsed_median_seconds": 56.298534,
+      "warm_elapsed_range_seconds": [
+        56.193157,
+        56.400284
+      ]
+    }
+  ],
+  "status": "measured-not-promoted",
+  "thread_matrix": [
+    1,
+    8,
+    10,
+    12,
+    16
+  ],
+  "warm_repetitions": 5,
+  "winner": null,
+  "winner_gate": "Select only after isolated and mixed OCR+interactive-chat trials also record CPU/RAM and preserve output quality."
+}

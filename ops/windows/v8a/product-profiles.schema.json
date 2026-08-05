@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-rag.invalid/schemas/v8a/product-profiles.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "profiles"],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "profiles": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "default",
+          "audience",
+          "runtime",
+          "ingress_mode",
+          "browser_origin",
+          "authentication_required",
+          "caddy_required",
+          "lan_dns_required",
+          "certificates_required",
+          "inbound_firewall_required",
+          "dedicated_windows_identities_required",
+          "stores",
+          "administration"
+        ],
+        "properties": {
+          "id": {"type": "string", "enum": ["personal", "team_lan", "contributor"]},
+          "default": {"type": "boolean"},
+          "audience": {"type": "string", "minLength": 1, "maxLength": 160},
+          "runtime": {"type": "string", "enum": ["packaged", "managed_windows", "source_tree"]},
+          "ingress_mode": {"type": "string", "enum": ["loopback", "private_lan_https", "development_loopback"]},
+          "browser_origin": {"type": "string", "minLength": 1, "maxLength": 128},
+          "authentication_required": {"type": "boolean"},
+          "caddy_required": {"type": "boolean"},
+          "lan_dns_required": {"type": "boolean"},
+          "certificates_required": {"type": "boolean"},
+          "inbound_firewall_required": {"type": "boolean"},
+          "dedicated_windows_identities_required": {"type": "boolean"},
+          "stores": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {"type": "string", "enum": ["postgresql_pgvector", "rustfs"]}
+          },
+          "administration": {"type": "string", "enum": ["owner_system", "full_system", "developer_tools"]}
+        }
+      }
+    }
+  }
+}

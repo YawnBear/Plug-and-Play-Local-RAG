@@ -1,0 +1,1039 @@
+{
+  "benchmark": "v6-adaptive-routing-retrieval-core",
+  "calibration": [
+    {
+      "actual_routing": [
+        "direct"
+      ],
+      "category": "clean_digital",
+      "chunk_count": 1,
+      "expected_routing": [
+        "direct"
+      ],
+      "id": "clean-digital",
+      "pages": 1,
+      "parse_methods": [
+        "direct"
+      ],
+      "passed": true,
+      "reason_codes": [
+        [
+          "reliable_direct_text"
+        ]
+      ]
+    },
+    {
+      "actual_routing": [
+        "ocr"
+      ],
+      "category": "image_only_scan",
+      "chunk_count": 1,
+      "expected_routing": [
+        "ocr"
+      ],
+      "id": "image-only-scan",
+      "pages": 1,
+      "parse_methods": [
+        "ocr"
+      ],
+      "passed": true,
+      "reason_codes": [
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ]
+      ]
+    },
+    {
+      "actual_routing": [
+        "direct",
+        "direct",
+        "direct"
+      ],
+      "category": "decorative_repeated_asset",
+      "chunk_count": 3,
+      "expected_routing": [
+        "direct",
+        "direct",
+        "direct"
+      ],
+      "id": "decorative-repeated-logo",
+      "pages": 3,
+      "parse_methods": [
+        "direct"
+      ],
+      "passed": true,
+      "reason_codes": [
+        [
+          "decorative_or_repeated_image"
+        ],
+        [
+          "decorative_or_repeated_image"
+        ],
+        [
+          "decorative_or_repeated_image"
+        ]
+      ]
+    },
+    {
+      "actual_routing": [
+        "hybrid"
+      ],
+      "category": "mixed_text_image",
+      "chunk_count": 2,
+      "expected_routing": [
+        "hybrid"
+      ],
+      "id": "mixed-text-informative-image",
+      "pages": 1,
+      "parse_methods": [
+        "direct",
+        "ocr"
+      ],
+      "passed": true,
+      "reason_codes": [
+        [
+          "meaningful_image_coverage"
+        ]
+      ]
+    },
+    {
+      "actual_routing": [
+        "hybrid"
+      ],
+      "category": "vector_chart_table",
+      "chunk_count": 2,
+      "expected_routing": [
+        "hybrid"
+      ],
+      "id": "vector-chart-table",
+      "pages": 1,
+      "parse_methods": [
+        "direct",
+        "ocr"
+      ],
+      "passed": true,
+      "reason_codes": [
+        [
+          "vector_drawing_candidate",
+          "unresolved_visual_geometry"
+        ]
+      ]
+    },
+    {
+      "actual_routing": [
+        "ocr"
+      ],
+      "category": "garbled_text_layer",
+      "chunk_count": 1,
+      "expected_routing": [
+        "ocr"
+      ],
+      "id": "garbled-text-layer",
+      "pages": 1,
+      "parse_methods": [
+        "ocr"
+      ],
+      "passed": true,
+      "reason_codes": [
+        [
+          "repeated_glyph_run"
+        ]
+      ]
+    },
+    {
+      "actual_routing": [
+        "ocr"
+      ],
+      "category": "skewed_photographed_page",
+      "chunk_count": 1,
+      "expected_routing": [
+        "ocr"
+      ],
+      "id": "skewed-photographed-page",
+      "pages": 1,
+      "parse_methods": [
+        "ocr"
+      ],
+      "passed": true,
+      "reason_codes": [
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ]
+      ]
+    },
+    {
+      "actual_routing": [
+        "hybrid"
+      ],
+      "category": "unresolved_visual_geometry",
+      "chunk_count": 2,
+      "expected_routing": [
+        "hybrid"
+      ],
+      "id": "unresolved-visual-geometry",
+      "pages": 1,
+      "parse_methods": [
+        "direct",
+        "ocr"
+      ],
+      "passed": true,
+      "reason_codes": [
+        [
+          "unresolved_visual_geometry"
+        ]
+      ]
+    },
+    {
+      "actual_routing": [
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr"
+      ],
+      "category": "ocr_batch_boundary",
+      "chunk_count": 33,
+      "expected_routing": [
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr",
+        "ocr"
+      ],
+      "id": "ocr-batch-33-pages",
+      "pages": 33,
+      "parse_methods": [
+        "ocr"
+      ],
+      "passed": true,
+      "reason_codes": [
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ],
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ]
+      ]
+    },
+    {
+      "actual_routing": [
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct"
+      ],
+      "category": "embedding_batch_boundary",
+      "chunk_count": 65,
+      "expected_routing": [
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct",
+        "direct"
+      ],
+      "id": "embedding-batch-65-chunks",
+      "pages": 65,
+      "parse_methods": [
+        "direct"
+      ],
+      "passed": true,
+      "reason_codes": [
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ],
+        [
+          "reliable_direct_text"
+        ]
+      ]
+    }
+  ],
+  "failures": [],
+  "fixtures": {
+    "core_corpus_identity": "9bca81bff4bfc38484c9bcb2fc8f1c35c88dd8410fc20520c0aca7b81b14a1ed",
+    "core_dataset_id": "v6-core-synthetic-001",
+    "routing_corpus_identity": "df67dfbf0ad3f645e53131387085abc650cddea9ea404ad86f57307d868bddfc",
+    "routing_dataset_id": "v6-routing-synthetic-001"
+  },
+  "live_cases": [
+    {
+      "actual_routing": [
+        "direct"
+      ],
+      "anchor_kinds": [
+        "text_quote"
+      ],
+      "chunk_content_sha256": "99c3d69b71c6fccd5f61c61ec369cf7827204a3401cb1cccc302168427184899",
+      "chunk_count": 1,
+      "elapsed_seconds": 0.000762,
+      "expected_routing": [
+        "direct"
+      ],
+      "id": "clean-digital",
+      "parse_methods": [
+        "direct"
+      ],
+      "passed": true,
+      "reason_codes": [
+        [
+          "reliable_direct_text"
+        ]
+      ],
+      "required_token_hash_checks": {
+        "ff626cd53e8b5ec305458ef44df6400ab1f0538e79a6f2a1e6c600e75679a32b": true
+      },
+      "source_sha256": "7ea97e8f61cb249839ef5d71733aff8aeac2c2dfadce2f61ac707c7a59555f3e"
+    },
+    {
+      "actual_routing": [
+        "ocr"
+      ],
+      "anchor_kinds": [
+        "ocr_regions"
+      ],
+      "chunk_content_sha256": "b37118c826ccacab702bcc479ee30f1d32feeb2e2863cae4717bf42b93651335",
+      "chunk_count": 1,
+      "elapsed_seconds": 54.212729,
+      "expected_routing": [
+        "ocr"
+      ],
+      "id": "image-only-scan",
+      "parse_methods": [
+        "ocr"
+      ],
+      "passed": true,
+      "reason_codes": [
+        [
+          "insufficient_meaningful_text",
+          "low_alphanumeric_ratio",
+          "meaningful_image_coverage"
+        ]
+      ],
+      "required_token_hash_checks": {
+        "98ea89044dabb65359352449e465c9afbb2a08023705a2eba6e62b0700a7d275": true
+      },
+      "source_sha256": "ad090cb0107a751128b38bed33e48a73a0f458913a6eb34d898f3d1cd6e15fc5"
+    },
+    {
+      "actual_routing": [
+        "hybrid"
+      ],
+      "anchor_kinds": [
+        "ocr_regions",
+        "text_quote"
+      ],
+      "chunk_content_sha256": "7b4370b98fef3840721d1f53d891e7ccf75677a9357c47ce3ff1f393ac75dcde",
+      "chunk_count": 2,
+      "elapsed_seconds": 117.233637,
+      "expected_routing": [
+        "hybrid"
+      ],
+      "id": "hybrid-visual-table",
+      "parse_methods": [
+        "direct",
+        "ocr"
+      ],
+      "passed": true,
+      "reason_codes": [
+        [
+          "meaningful_image_coverage"
+        ]
+      ],
+      "required_token_hash_checks": {
+        "95d1ceb9f02f04e23c90565530b0be0074cab736cec2cea451f3e6cd5b4f6f15": true,
+        "ebe8fe63ba5dfc1d010d1ecff734f913621350614992f2572d207c0babf046e4": true
+      },
+      "source_sha256": "3705a6dd902f15ca897d9841c396186700a878abbdca8b16073b6e281bda6abd"
+    }
+  ],
+  "promotion_criteria": {
+    "all_declared_routes_exact": true,
+    "dense_and_cpu_reranker_expected_source_rank": 1,
+    "hybrid_direct_and_ocr_provenance_with_valid_anchors": true,
+    "no_duplicate_hybrid_prose": true,
+    "real_direct_scan_and_hybrid_tokens_preserved": true,
+    "zero_failures": true
+  },
+  "retrieval": [
+    {
+      "dense_rank": 1,
+      "dense_top_candidates": [
+        {
+          "parse_method": "direct",
+          "source": "hybrid-visual-table"
+        },
+        {
+          "parse_method": "ocr",
+          "source": "hybrid-visual-table"
+        },
+        {
+          "parse_method": "ocr",
+          "source": "image-only-scan"
+        },
+        {
+          "parse_method": "direct",
+          "source": "clean-digital"
+        }
+      ],
+      "expected_parse_method": "direct",
+      "expected_source": "hybrid-visual-table",
+      "id": "digital-direct",
+      "passed": true,
+      "query_sha256": "ebe8fe63ba5dfc1d010d1ecff734f913621350614992f2572d207c0babf046e4",
+      "reranker_rank": 1,
+      "reranker_top_candidates": [
+        {
+          "parse_method": "direct",
+          "source": "hybrid-visual-table"
+        },
+        {
+          "parse_method": "ocr",
+          "source": "hybrid-visual-table"
+        },
+        {
+          "parse_method": "direct",
+          "source": "clean-digital"
+        },
+        {
+          "parse_method": "ocr",
+          "source": "image-only-scan"
+        }
+      ]
+    },
+    {
+      "dense_rank": 1,
+      "dense_top_candidates": [
+        {
+          "parse_method": "ocr",
+          "source": "image-only-scan"
+        },
+        {
+          "parse_method": "direct",
+          "source": "clean-digital"
+        },
+        {
+          "parse_method": "direct",
+          "source": "hybrid-visual-table"
+        },
+        {
+          "parse_method": "ocr",
+          "source": "hybrid-visual-table"
+        }
+      ],
+      "expected_parse_method": "ocr",
+      "expected_source": "image-only-scan",
+      "id": "scanned-policy",
+      "passed": true,
+      "query_sha256": "98ea89044dabb65359352449e465c9afbb2a08023705a2eba6e62b0700a7d275",
+      "reranker_rank": 1,
+      "reranker_top_candidates": [
+        {
+          "parse_method": "ocr",
+          "source": "image-only-scan"
+        },
+        {
+          "parse_method": "direct",
+          "source": "hybrid-visual-table"
+        },
+        {
+          "parse_method": "direct",
+          "source": "clean-digital"
+        },
+        {
+          "parse_method": "ocr",
+          "source": "hybrid-visual-table"
+        }
+      ]
+    },
+    {
+      "dense_rank": 1,
+      "dense_top_candidates": [
+        {
+          "parse_method": "ocr",
+          "source": "hybrid-visual-table"
+        },
+        {
+          "parse_method": "direct",
+          "source": "hybrid-visual-table"
+        },
+        {
+          "parse_method": "ocr",
+          "source": "image-only-scan"
+        },
+        {
+          "parse_method": "direct",
+          "source": "clean-digital"
+        }
+      ],
+      "expected_parse_method": "ocr",
+      "expected_source": "hybrid-visual-table",
+      "id": "visual-table",
+      "passed": true,
+      "query_sha256": "95d1ceb9f02f04e23c90565530b0be0074cab736cec2cea451f3e6cd5b4f6f15",
+      "reranker_rank": 1,
+      "reranker_top_candidates": [
+        {
+          "parse_method": "ocr",
+          "source": "hybrid-visual-table"
+        },
+        {
+          "parse_method": "direct",
+          "source": "hybrid-visual-table"
+        },
+        {
+          "parse_method": "direct",
+          "source": "clean-digital"
+        },
+        {
+          "parse_method": "ocr",
+          "source": "image-only-scan"
+        }
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "status": "qualified",
+  "target": {
+    "embedding_dimensions": 1024,
+    "embedding_model": "qwen3-embedding:0.6b",
+    "ocr_executable": "<redacted-local-ocr-environment>",
+    "ocr_layout": "1 process x 10 CPU threads",
+    "ocr_pipeline": "PaddleOCR-VL v1.6",
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13",
+    "reranker_model": "BAAI/bge-reranker-v2-m3"
+  },
+  "total_elapsed_seconds": 183.931735,
+  "versions": {
+    "chunking": "fragment-paragraph-sentence-v2",
+    "parser": "pypdf+paddleocr-vl-v1.6-adaptive-v2"
+  }
+}

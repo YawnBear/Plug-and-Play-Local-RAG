@@ -1,0 +1,22 @@
+{
+  "name": "rag",
+  "private": true,
+  "packageManager": "pnpm@11.8.0",
+  "scripts": {
+    "dev": "node scripts/dev-system.mjs",
+    "dev:check": "node scripts/dev-system.mjs --check",
+    "dev:web": "pnpm --dir apps/web dev",
+    "dev:api": "uv --directory apps/api run python -m app.dev_server",
+    "build": "pnpm --dir apps/web build",
+    "lint": "pnpm lint:web && pnpm lint:api",
+    "lint:web": "pnpm --dir apps/web lint",
+    "lint:api": "uv --directory apps/api run ruff check .",
+    "test": "pnpm test:dev-system && pnpm test:api",
+    "test:dev-system": "node --test scripts/dev-system.test.mjs",
+    "test:api": "uv --directory apps/api run pytest",
+    "test:api:integration": "uv --directory apps/api run pytest -m integration",
+    "test:web": "pnpm --dir apps/web test",
+    "typecheck": "pnpm --dir apps/web typecheck",
+    "validate": "pnpm lint && pnpm test && pnpm test:web && pnpm typecheck && pnpm build"
+  }
+}

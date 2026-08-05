@@ -1,0 +1,36 @@
+name: Bug report
+description: Report a reproducible Local RAG problem without private data.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not report vulnerabilities here. Follow the SECURITY file instead.
+  - type: input
+    id: release
+    attributes:
+      label: Signed release version
+      placeholder: e.g. 8.0.0
+    validations:
+      required: true
+  - type: dropdown
+    id: profile
+    attributes:
+      label: Product profile
+      options: [Personal, Team/LAN, Contributor source checkout]
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened?
+      description: Include steps, expected behavior, actual behavior, and visible reason codes.
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I removed documents, filenames, prompts, answers, credentials, tokens, environment files, private keys, and unrestricted logs.
+          required: true

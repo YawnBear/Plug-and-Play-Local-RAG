@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "policy_id": "local-rag-v8-release-trust",
+  "production_signature_required": true,
+  "production_signing_milestone": "V8F",
+  "trust_anchor_state": "v8f_required",
+  "development_mode": {
+    "explicit_source_switch": true,
+    "ephemeral_test_keys_only": true,
+    "production_key_forbidden": true
+  },
+  "metadata": {
+    "maximum_lifetime_days": 30,
+    "release_sequence_required": true,
+    "anti_rollback_required": true,
+    "exact_artifact_set_required": true
+  },
+  "rotation": {
+    "cross_signature_required": true,
+    "old_root_authorizes_new_root": true
+  },
+  "revocation": {
+    "release_ids": [],
+    "profile_ids": [],
+    "fail_closed": true
+  }
+}

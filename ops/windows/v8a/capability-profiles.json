@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "catalog_id": "local-rag-v8a-baseline",
+  "catalog_revision": 1,
+  "profiles": [
+    {
+      "profile_id": "generation.qwen3-8b.ollama.windows-x64",
+      "function": "generation",
+      "release_support_class": "release_qualified",
+      "operating_system": "windows",
+      "architecture": "x64",
+      "accelerator_vendor": "other",
+      "engine": "ollama",
+      "model_identity": "qwen3:8b",
+      "artifact_ids": ["ollama.qwen3-8b"],
+      "minimum_ram_gib": 16,
+      "minimum_vram_gib": 0,
+      "local_validation_fixture": "generation.basic-v1",
+      "impact_class": "restart_generation"
+    },
+    {
+      "profile_id": "embedding.qwen3-0.6b-1024.ollama.windows-x64",
+      "function": "embedding",
+      "release_support_class": "release_qualified",
+      "operating_system": "windows",
+      "architecture": "x64",
+      "accelerator_vendor": "other",
+      "engine": "ollama",
+      "model_identity": "qwen3-embedding:0.6b",
+      "artifact_ids": ["ollama.qwen3-embedding-0.6b"],
+      "minimum_ram_gib": 8,
+      "minimum_vram_gib": 0,
+      "local_validation_fixture": "embedding.dimension-1024-v1",
+      "impact_class": "full_shadow_reindex"
+    },
+    {
+      "profile_id": "reranking.bge-v2-m3.cpu.windows-x64",
+      "function": "reranking",
+      "release_support_class": "release_qualified",
+      "operating_system": "windows",
+      "architecture": "x64",
+      "accelerator_vendor": "cpu",
+      "engine": "transformers",
+      "model_identity": "BAAI/bge-reranker-v2-m3",
+      "artifact_ids": ["model.bge-reranker-v2-m3"],
+      "minimum_ram_gib": 16,
+      "minimum_vram_gib": 0,
+      "local_validation_fixture": "reranker.ordering-v1",
+      "impact_class": "restart_reranker"
+    },
+    {
+      "profile_id": "ocr.paddleocr-vl-1.6.cpu.windows-x64",
+      "function": "ocr",
+      "release_support_class": "release_qualified",
+      "operating_system": "windows",
+      "architecture": "x64",
+      "accelerator_vendor": "cpu",
+      "engine": "paddleocr-vl",
+      "model_identity": "PaddleOCR-VL 1.6",
+      "artifact_ids": ["runtime.ocr-python", "model.paddleocr-vl-1.6"],
+      "minimum_ram_gib": 24,
+      "minimum_vram_gib": 0,
+      "local_validation_fixture": "ocr.representative-pdf-v1",
+      "impact_class": "restart_ocr"
+    }
+  ]
+}

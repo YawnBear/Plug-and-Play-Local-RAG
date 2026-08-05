@@ -1,0 +1,4 @@
+Local RAG API
+
+FastAPI backend for Local RAG. The project requires Python 3.12 and is managed
+with uv from apps/api. Use the repository-level README for setup and validation.

@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "checkpoint": "V6 Core Phase 0",
+  "status": "adaptive-routing-qualified",
+  "target": {
+    "cpu": "AMD Ryzen 7 7700, 8 cores / 16 threads",
+    "memory_gib": 32,
+    "gpu": "AMD Radeon RX 6700 XT, 12 GiB",
+    "os": "Windows 10/11"
+  },
+  "fixed_models": {
+    "generation": "qwen3:8b",
+    "embedding": "qwen3-embedding:0.6b",
+    "embedding_dimensions": 1024,
+    "reranker": "BAAI/bge-reranker-v2-m3",
+    "ocr": "PaddleOCR-VL 1.6 CPU"
+  },
+  "fixture_identity": {
+    "status": "recorded-on-target",
+    "generator": "benchmarks.v6.fixtures",
+    "dataset_id": "v6-core-synthetic-001",
+    "corpus_identity": "9bca81bff4bfc38484c9bcb2fc8f1c35c88dd8410fc20520c0aca7b81b14a1ed",
+    "ocr_fixture": "image-only-scan.pdf",
+    "ocr_fixture_sha256": "ad090cb0107a751128b38bed33e48a73a0f458913a6eb34d898f3d1cd6e15fc5"
+  },
+  "runtime_versions": {
+    "status": "recorded-for-ocr-benchmark",
+    "python": "3.13.7",
+    "paddle": "3.2.1",
+    "paddleocr": "3.7.0",
+    "paddlex": "3.7.2",
+    "ocr_pipeline": "v1.6",
+    "device": "cpu"
+  },
+  "retained_v6_core_limits_and_batches": {
+    "ocr_page_batch_size": 8,
+    "embedding_batch_size": 16,
+    "maximum_pdf_pages": 500,
+    "maximum_ocr_pages": 128,
+    "maximum_document_chunks": 5000,
+    "maximum_extracted_text_characters": 10000000,
+    "maximum_staged_ocr_result_bytes": 67108864,
+    "ingestion_processing_timeout_seconds": 3600
+  },
+  "retrieval_baseline": {
+    "status": "completed-qualified",
+    "scope": "minimal V6 Core direct, full-page OCR, and hybrid visual-supplement preservation checks",
+    "report": "../results/routing-retrieval-20260728.json",
+    "report_sha256": "d0dfd129a163c5cf9954915023a416d54f23468f4201deac82a8e9183d51407f",
+    "dense_expected_chunk_rank": 1,
+    "cpu_reranker_expected_chunk_rank": 1,
+    "large_labelled_corpus": "deferred to V6.1"
+  },
+  "routing_baseline": {
+    "status": "completed-qualified",
+    "report": "../results/routing-retrieval-20260728.json",
+    "report_sha256": "d0dfd129a163c5cf9954915023a416d54f23468f4201deac82a8e9183d51407f",
+    "calibration_documents": 10,
+    "real_target_host_cases": 3,
+    "failures": 0,
+    "required_categories": [
+      "clean_digital",
+      "image_only_scan",
+      "decorative_repeated_asset",
+      "mixed_text_image",
+      "vector_chart_table",
+      "garbled_text_layer",
+      "skewed_photographed_page",
+      "unresolved_visual_geometry"
+    ]
+  },
+  "model_loading_observations": {
+    "status": "completed-for-routing-gate",
+    "ocr_layout": "1 process x 10 CPU threads",
+    "reranker": "BAAI/bge-reranker-v2-m3 on CPU",
+    "embedding": "qwen3-embedding:0.6b through Ollama"
+  },
+  "cold_warm_timings_cpu_memory_and_output_digests": {
+    "status": "isolated-ocr-collected",
+    "report": "../results/ocr-threads-20260727.json",
+    "report_sha256": "6c1a263f87f426c7171bdc4a3f7c6088bd6f5cd85b4d80c71482e020a4f152e3"
+  },
+  "ocr_thread_baseline": {
+    "status": "isolated-measured-production-default-mixed-validated",
+    "required_threads": [1, 8, 10, 12, 16],
+    "warm_median_seconds": {
+      "1": 61.312264,
+      "8": 59.221926,
+      "10": 58.613165,
+      "12": 57.81117,
+      "16": 56.298534
+    },
+    "quality_stable_for_all_settings": true,
+    "fastest_isolated_threads": 16,
+    "fastest_isolated_speedup_vs_one_thread_percent": 8.9,
+    "production_winner": 10,
+    "retained_provisional_default_threads": 10
+  },
+  "ocr_process_baseline": {
+    "status": "mixed-candidate-rejected",
+    "report": "../results/ocr-processes-20260727.json",
+    "report_sha256": "448dd85a58ead24b03a1e291c87bbb70aa38b5d96d7b516c57d7ad3498c7e05e",
+    "workload": "four repetitions of the one-page image-only scan",
+    "warm_median_seconds": {
+      "1_process_10_threads": 114.468989,
+      "2_processes_4_threads_each": 94.961317,
+      "2_processes_6_threads_each": 107.304633
+    },
+    "quality_identical_across_all_18_trials": true,
+    "fastest_isolated_layout": "2_processes_4_threads_each",
+    "fastest_isolated_speedup_vs_1_process_10_threads_percent": 20.5,
+    "fastest_layout_peak_combined_working_set_gib": 16.96,
+    "fastest_layout_minimum_free_physical_memory_gib": 5.83,
+    "fastest_layout_maximum_host_memory_load_percent": 81,
+    "low_headroom_preflight": "2x4 aborted below the 2 GiB free-memory guard when starting with approximately 12.5 GiB free",
+    "production_winner": "1_process_10_threads",
+    "retained_production_layout": "1_process_10_threads"
+  },
+  "mixed_ocr_chat_baseline": {
+    "status": "completed-candidate-rejected",
+    "report": "../results/ocr-chat-mixed-20260728.json",
+    "report_sha256": "a3de6a62ded4ef929390ddd5af4b52a0ca343e2fe5cb40a2d9b359769bf9a529",
+    "scope": "Synthetic in-memory dense retrieval with real Ollama query embedding, CPU BGE reranking, streamed qwen3:8b generation, and real PaddleOCR-VL; no production database or document data.",
+    "queue_free_first_token_p95_seconds": 0.895111,
+    "one_process_10_threads": {
+      "warm_ocr_median_seconds": 113.555548,
+      "warm_chat_samples": 20,
+      "first_token_p95_seconds": 1.0551,
+      "first_token_p95_degradation_percent": 17.9,
+      "final_answer_p95_seconds": 1.121539,
+      "minimum_free_physical_memory_gib": 5.768,
+      "quality_passed": true,
+      "gate_passed": true
+    },
+    "two_processes_4_threads_each": {
+      "gate_passed": false,
+      "failure": "Cold mixed trial crossed the 2 GiB free-physical-memory emergency guard; both OCR processes were terminated.",
+      "chat_quality_before_termination": true
+    },
+    "selected_production_layout": "1_process_10_threads"
+  },
+  "promotion_decision": "Adaptive page routing is qualified and enabled for new ingestion with the one-process, 10-thread OCR layout. The dual-process OCR candidate remains rejected for this 32 GiB host, and the isolated 16-thread result remains unqualified as a production thread-default change."
+}

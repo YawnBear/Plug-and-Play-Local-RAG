@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "alembic_revision",
+    "force_rls_tables",
+    "containers",
+    "rustfs",
+    "ollama_models",
+    "reranker",
+    "ocr",
+    "runtimes",
+    "verifier_sha256",
+    "max_evidence_age_seconds"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "alembic_revision": {"const": "0006_versioned_claim"},
+    "force_rls_tables": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 25,
+      "maxItems": 25,
+      "items": {
+        "enum": [
+          "access_grants",
+          "acl_previews",
+          "audit_events",
+          "backup_runs",
+          "chat_scopes",
+          "chat_turns",
+          "chats",
+          "chunks",
+          "documents",
+          "effective_document_access",
+          "folder_create_grants",
+          "ingestion_jobs",
+          "library_nodes",
+          "login_throttles",
+          "object_deletions",
+          "pre_auth_challenges",
+          "security_epochs",
+          "service_leases",
+          "sessions",
+          "team_members",
+          "teams",
+          "turn_citations",
+          "turn_sources",
+          "upload_reservations",
+          "users"
+        ]
+      }
+    },
+    "containers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["postgres_image_digest", "rustfs_image_digest"],
+      "properties": {
+        "postgres_image_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "rustfs_image_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "rustfs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bucket", "probe_object_key", "probe_object_sha256"],
+      "properties": {
+        "bucket": {"type": "string", "minLength": 1},
+        "probe_object_key": {"type": "string", "minLength": 1},
+        "probe_object_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "ollama_models": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["qwen3:8b", "qwen3-embedding:0.6b"],
+      "properties": {
+        "qwen3:8b": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "qwen3-embedding:0.6b": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "reranker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity", "device", "model_assets_sha256"],
+      "properties": {
+        "identity": {"const": "BAAI/bge-reranker-v2-m3"},
+        "device": {"const": "cpu"},
+        "model_assets_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "ocr": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "paddleocr_version",
+        "pipeline_version",
+        "fixture_sha256",
+        "expected_output_sha256",
+        "expected_structured_sha256",
+        "expected_text_sha256",
+        "expected_page_count",
+        "model_assets_sha256"
+      ],
+      "properties": {
+        "paddleocr_version": {"type": "string", "minLength": 1},
+        "pipeline_version": {"const": "1.6"},
+        "fixture_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expected_output_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expected_structured_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expected_text_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "expected_page_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "model_assets_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "verifier_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "runtimes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "api_python_sha256",
+        "ocr_python_sha256",
+        "openssl_tree_sha256",
+        "api_python_tree_sha256",
+        "ocr_python_tree_sha256",
+        "node_tree_sha256",
+        "docker_executable_sha256"
+      ],
+      "properties": {
+        "api_python_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "ocr_python_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "openssl_tree_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "api_python_tree_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "ocr_python_tree_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "node_tree_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "docker_executable_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "max_evidence_age_seconds": {
+      "type": "integer",
+      "minimum": 60,
+      "maximum": 3600
+    }
+  }
+}

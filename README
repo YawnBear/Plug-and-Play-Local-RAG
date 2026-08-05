@@ -1,0 +1,48 @@
+LOCAL RAG
+=========
+
+Local RAG is a Windows-first, self-hosted document search and question-answering
+application. It uses Next.js, FastAPI, PostgreSQL with pgvector, RustFS, Ollama,
+BAAI bge reranking, and PaddleOCR-VL. Documents, prompts, and answers remain on
+the operator's own machine or private LAN deployment.
+
+STATUS
+
+This repository publishes the source tree. The optional signed Personal bundle
+is a separate convenience distribution and must not be treated as qualified
+until a signed GitHub Release explicitly says so.
+
+QUICK START
+
+Supported developer and Personal source platform: 64-bit Windows 10/11.
+
+Install and start Docker Desktop and Ollama, then install Node.js 20 or newer,
+Python 3.12, and uv. Clone this repository and double-click:
+
+    Setup-Local-RAG.cmd
+
+The setup program installs locked source dependencies, prepares isolated local
+stores and secrets, downloads the approved Ollama models, builds the web app,
+and opens the first-owner setup flow. There is no default username or password.
+
+DEVELOPMENT VALIDATION
+
+    uv --directory apps/api sync --frozen
+    pnpm install --frozen-lockfile
+    pnpm validate
+
+Hardware-dependent OCR, model, database, object-storage, browser, backup, and
+restore checks are intentionally separate from the ordinary source test suite.
+
+PRIVACY AND SECURITY
+
+Never submit real documents, filenames, prompts, answers, credentials, tokens,
+environment files, private keys, database dumps, or unrestricted logs. Report
+suspected vulnerabilities privately through the repository's GitHub Security
+Advisory page; see SECURITY.
+
+LICENSE
+
+Local RAG source code is licensed under Apache License 2.0. Third-party
+components and machine-learning models retain their upstream licenses. See
+LICENSE, NOTICE, THIRD_PARTY_NOTICES, MODEL_LICENSES, and SBOM.cdx.json.

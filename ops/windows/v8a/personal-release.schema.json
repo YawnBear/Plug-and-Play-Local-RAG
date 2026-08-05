@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-rag.invalid/schemas/v8a/personal-release.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "manifest_id",
+    "profile_id",
+    "payload_state",
+    "expected_alembic_revision",
+    "external_dependencies",
+    "artifacts",
+    "stores",
+    "ollama_models",
+    "install_steps"
+  ],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "manifest_id": {"type": "string", "const": "local-rag-v8a-personal"},
+    "profile_id": {"type": "string", "const": "personal"},
+    "payload_state": {"type": "string", "enum": ["development_template", "packaged"]},
+    "expected_alembic_revision": {"type": "string", "pattern": "^[0-9]{4}_[a-z0-9_]+$"},
+    "external_dependencies": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "required", "installer_owner"],
+        "properties": {
+          "id": {"type": "string", "enum": ["docker_desktop", "ollama"]},
+          "required": {"type": "boolean", "const": true},
+          "installer_owner": {"type": "string", "const": "user"}
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifact_id", "relative_path", "kind", "required", "digest_binding", "license_notice_id"],
+        "properties": {
+          "artifact_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,95}$"},
+          "relative_path": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+(?:[\\/][A-Za-z0-9_.-]+)*$"},
+          "kind": {"type": "string", "enum": ["executable", "directory", "file"]},
+          "required": {"type": "boolean", "const": true},
+          "digest_binding": {"type": "string", "const": "signed_release_manifest"},
+          "license_notice_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,95}$"}
+        }
+      }
+    },
+    "stores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["compose_file", "postgres_image", "rustfs_image", "postgres_port", "rustfs_port", "volume_policy"],
+      "properties": {
+        "compose_file": {"type": "string", "const": "ops/windows/v8a/compose.personal.yaml"},
+        "postgres_image": {"type": "string", "pattern": "^.+@sha256:[0-9a-f]{64}$"},
+        "rustfs_image": {"type": "string", "pattern": "^.+@sha256:[0-9a-f]{64}$"},
+        "postgres_port": {"type": "integer", "const": 5432},
+        "rustfs_port": {"type": "integer", "const": 9000},
+        "volume_policy": {"type": "string", "const": "new_bind_mounts_preserve_on_uninstall"}
+      }
+    },
+    "ollama_models": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["identity", "capability_profile_id", "download_policy", "expected_digest", "license_notice_id"],
+        "properties": {
+          "identity": {"type": "string", "enum": ["qwen3:8b", "qwen3-embedding:0.6b"]},
+          "capability_profile_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,95}$"},
+          "download_policy": {"type": "string", "const": "pinned_resumable"},
+          "expected_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "license_notice_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,95}$"}
+        }
+      }
+    },
+    "install_steps": {
+      "type": "array",
+      "minItems": 11,
+      "maxItems": 11,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "contracts_validated",
+          "prerequisites_validated",
+          "roots_created",
+          "secrets_created",
+          "stores_started",
+          "postgres_provisioned",
+          "rustfs_provisioned",
+          "schema_migrated",
+          "storage_bootstrapped",
+          "models_acquired",
+          "setup_code_issued"
+        ]
+      }
+    }
+  }
+}

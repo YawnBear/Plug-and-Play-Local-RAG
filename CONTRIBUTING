@@ -1,0 +1,21 @@
+CONTRIBUTING
+
+Local RAG accepts contributions under Apache License 2.0. No contributor
+license agreement is currently required.
+
+The qualified development platform is 64-bit Windows 10/11 with Python 3.12,
+uv, Node.js, pnpm 11.8.0, Docker Desktop, and Ollama.
+
+Before submitting a pull request:
+
+    uv --directory apps/api sync --frozen
+    pnpm install --frozen-lockfile
+    pnpm validate
+
+Keep changes narrowly scoped, add regression tests for behavior changes, and
+state exactly which checks were run. Never submit private documents, filenames,
+prompts, answers, credentials, tokens, environment files, private keys, database
+dumps, or identifying diagnostics.
+
+By submitting a contribution, you agree that it is licensed under Apache
+License 2.0 as described in section 5 of LICENSE.

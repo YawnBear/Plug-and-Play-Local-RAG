@@ -1,0 +1,9 @@
+{
+  "schema_version": 2,
+  "state": "configured",
+  "version": "2.11.3",
+  "download_uri": "https://github.com/caddyserver/caddy/releases/download/v2.11.3/caddy_2.11.3_windows_amd64.zip",
+  "archive_sha512": "338f5557a1554677875b79dbc4b10d008781111ad29223811e64217936fa5d58602ddd54724ef1cb1473b7ec07805cf5286d6aa1e810febde7e36daf497d791f",
+  "executable_sha256": "67514bc0449ae9b1465cf3d59ab269cb451e8ed88d991e461b24d1337b67f536",
+  "plugins": []
+}

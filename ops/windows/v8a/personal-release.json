@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "manifest_id": "local-rag-v8a-personal",
+  "profile_id": "personal",
+  "payload_state": "development_template",
+  "expected_alembic_revision": "0014_restart_without_backup",
+  "external_dependencies": [
+    {"id": "docker_desktop", "required": true, "installer_owner": "user"},
+    {"id": "ollama", "required": true, "installer_owner": "user"}
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "runtime.api-python",
+      "relative_path": "runtimes/api-python/python.exe",
+      "kind": "executable",
+      "required": true,
+      "digest_binding": "signed_release_manifest",
+      "license_notice_id": "python-runtime"
+    },
+    {
+      "artifact_id": "runtime.ocr-python",
+      "relative_path": "runtimes/ocr-python/python.exe",
+      "kind": "executable",
+      "required": true,
+      "digest_binding": "signed_release_manifest",
+      "license_notice_id": "python-paddle-runtime"
+    },
+    {
+      "artifact_id": "runtime.node",
+      "relative_path": "runtimes/node/node.exe",
+      "kind": "executable",
+      "required": true,
+      "digest_binding": "signed_release_manifest",
+      "license_notice_id": "nodejs-runtime"
+    },
+    {
+      "artifact_id": "tool.mc",
+      "relative_path": "tools/mc/mc.exe",
+      "kind": "executable",
+      "required": true,
+      "digest_binding": "signed_release_manifest",
+      "license_notice_id": "minio-client"
+    },
+    {
+      "artifact_id": "application.api",
+      "relative_path": "apps/api",
+      "kind": "directory",
+      "required": true,
+      "digest_binding": "signed_release_manifest",
+      "license_notice_id": "local-rag-project"
+    },
+    {
+      "artifact_id": "application.web",
+      "relative_path": "apps/web/.next/standalone/apps/web/server.js",
+      "kind": "file",
+      "required": true,
+      "digest_binding": "signed_release_manifest",
+      "license_notice_id": "local-rag-project"
+    },
+    {
+      "artifact_id": "model.bge-reranker-v2-m3",
+      "relative_path": "models/bge-reranker-v2-m3",
+      "kind": "directory",
+      "required": true,
+      "digest_binding": "signed_release_manifest",
+      "license_notice_id": "bge-reranker-v2-m3"
+    },
+    {
+      "artifact_id": "model.paddleocr-vl-1.6",
+      "relative_path": "models/paddleocr-vl-1.6",
+      "kind": "directory",
+      "required": true,
+      "digest_binding": "signed_release_manifest",
+      "license_notice_id": "paddleocr-vl-1.6"
+    }
+  ],
+  "stores": {
+    "compose_file": "ops/windows/v8a/compose.personal.yaml",
+    "postgres_image": "pgvector/pgvector:0.8.5-pg18-bookworm@sha256:766437bbab40c7d0b080d380e2976f9ca2e880ce8fe7544c60e832eceaf43c1c",
+    "rustfs_image": "rustfs/rustfs:1.0.0-beta.10@sha256:60f4f2f41ce95216f8cac676e69f9d90c0bfec458a3bc7fd7fb9b7c2452ac57a",
+    "postgres_port": 5432,
+    "rustfs_port": 9000,
+    "volume_policy": "new_bind_mounts_preserve_on_uninstall"
+  },
+  "ollama_models": [
+    {
+      "identity": "qwen3:8b",
+      "capability_profile_id": "generation.qwen3-8b.ollama.windows-x64",
+      "download_policy": "pinned_resumable",
+      "expected_digest": "500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41",
+      "license_notice_id": "qwen3-8b-ollama"
+    },
+    {
+      "identity": "qwen3-embedding:0.6b",
+      "capability_profile_id": "embedding.qwen3-0.6b-1024.ollama.windows-x64",
+      "download_policy": "pinned_resumable",
+      "expected_digest": "ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d",
+      "license_notice_id": "qwen3-embedding-0.6b-ollama"
+    }
+  ],
+  "install_steps": [
+    "contracts_validated",
+    "prerequisites_validated",
+    "roots_created",
+    "secrets_created",
+    "stores_started",
+    "postgres_provisioned",
+    "rustfs_provisioned",
+    "schema_migrated",
+    "storage_bootstrapped",
+    "models_acquired",
+    "setup_code_issued"
+  ]
+}

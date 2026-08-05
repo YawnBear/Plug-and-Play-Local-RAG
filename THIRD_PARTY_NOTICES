@@ -1,0 +1,17 @@
+THIRD-PARTY NOTICES
+
+Local RAG combines third-party libraries, runtimes, container images, and
+machine-learning models. Each remains under its upstream license. The complete
+machine-readable inventory is SBOM.cdx.json; the fixed model catalog and
+upstream license links are in MODEL_LICENSES.
+
+Redistributed packages must include the license and notice material required by
+every component. The bundled unmodified MinIO Client (mc) is AGPL-3.0 and must
+include its license, notices, and a durable link to the corresponding source for
+the exact distributed build: https://github.com/minio/mc.
+
+PostgreSQL/pgvector and RustFS services are pulled as immutable container image
+digests. Docker Desktop and Ollama are separately installed prerequisites and
+are not relicensed or redistributed by this repository.
+
+This notice is informational and does not replace any upstream license.

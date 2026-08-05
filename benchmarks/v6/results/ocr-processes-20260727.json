@@ -1,0 +1,430 @@
+{
+  "cold_repetitions": 1,
+  "fixture": {
+    "path": "image-only-scan.pdf",
+    "repeated_pages": 4,
+    "sha256": "ad090cb0107a751128b38bed33e48a73a0f458913a6eb34d898f3d1cd6e15fc5"
+  },
+  "memory_guard": {
+    "minimum_available_physical_bytes": 2147483648
+  },
+  "mixed_workload": {
+    "status": "not_run"
+  },
+  "pipeline_version": "v1.6",
+  "process_matrix": [
+    {
+      "process_count": 1,
+      "threads_per_process": 10
+    },
+    {
+      "process_count": 2,
+      "threads_per_process": 4
+    },
+    {
+      "process_count": 2,
+      "threads_per_process": 6
+    }
+  ],
+  "quality_identical_across_matrix": true,
+  "schema_version": 1,
+  "settings": [
+    {
+      "cold": {
+        "average_host_cpu_percent": 9.454,
+        "elapsed_seconds": 111.049107,
+        "individual_peak_working_set_bytes": [
+          9102540800
+        ],
+        "maximum_memory_load_percent": 53,
+        "minimum_available_physical_bytes": 15415463936,
+        "pages": 4,
+        "peak_combined_working_set_bytes": 9102540800,
+        "process_count": 1,
+        "process_cpu_seconds": 167.984375,
+        "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+        "result_bytes": 10983,
+        "result_count": 4,
+        "threads_per_process": 10,
+        "total_physical_bytes": 33409208320,
+        "total_thread_ceiling": 10
+      },
+      "process_count": 1,
+      "quality_stable": true,
+      "threads_per_process": 10,
+      "throughput_speedup_vs_1x10": 1.0,
+      "warm": [
+        {
+          "average_host_cpu_percent": 9.581,
+          "elapsed_seconds": 112.261878,
+          "individual_peak_working_set_bytes": [
+            9103122432
+          ],
+          "maximum_memory_load_percent": 53,
+          "minimum_available_physical_bytes": 15400615936,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 9103122432,
+          "process_count": 1,
+          "process_cpu_seconds": 172.09375,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10983,
+          "result_count": 4,
+          "threads_per_process": 10,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 10
+        },
+        {
+          "average_host_cpu_percent": 9.425,
+          "elapsed_seconds": 112.55383,
+          "individual_peak_working_set_bytes": [
+            9103196160
+          ],
+          "maximum_memory_load_percent": 54,
+          "minimum_available_physical_bytes": 15187259392,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 9103196160,
+          "process_count": 1,
+          "process_cpu_seconds": 169.734375,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10983,
+          "result_count": 4,
+          "threads_per_process": 10,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 10
+        },
+        {
+          "average_host_cpu_percent": 9.866,
+          "elapsed_seconds": 114.468989,
+          "individual_peak_working_set_bytes": [
+            9092206592
+          ],
+          "maximum_memory_load_percent": 54,
+          "minimum_available_physical_bytes": 15252869120,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 9092206592,
+          "process_count": 1,
+          "process_cpu_seconds": 180.703125,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10983,
+          "result_count": 4,
+          "threads_per_process": 10,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 10
+        },
+        {
+          "average_host_cpu_percent": 9.872,
+          "elapsed_seconds": 114.897396,
+          "individual_peak_working_set_bytes": [
+            9092775936
+          ],
+          "maximum_memory_load_percent": 54,
+          "minimum_available_physical_bytes": 15303852032,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 9092775936,
+          "process_count": 1,
+          "process_cpu_seconds": 181.484375,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10983,
+          "result_count": 4,
+          "threads_per_process": 10,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 10
+        },
+        {
+          "average_host_cpu_percent": 9.899,
+          "elapsed_seconds": 114.832471,
+          "individual_peak_working_set_bytes": [
+            9090801664
+          ],
+          "maximum_memory_load_percent": 54,
+          "minimum_available_physical_bytes": 15365165056,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 9090801664,
+          "process_count": 1,
+          "process_cpu_seconds": 181.875,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10983,
+          "result_count": 4,
+          "threads_per_process": 10,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 10
+        }
+      ],
+      "warm_elapsed_median_seconds": 114.468989,
+      "warm_elapsed_range_seconds": [
+        112.261878,
+        114.897396
+      ]
+    },
+    {
+      "cold": {
+        "average_host_cpu_percent": 14.843,
+        "elapsed_seconds": 105.810839,
+        "individual_peak_working_set_bytes": [
+          9093087232,
+          9093320704
+        ],
+        "maximum_memory_load_percent": 80,
+        "minimum_available_physical_bytes": 6439452672,
+        "pages": 4,
+        "peak_combined_working_set_bytes": 18186407936,
+        "process_count": 2,
+        "process_cpu_seconds": 251.28125,
+        "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+        "result_bytes": 10980,
+        "result_count": 4,
+        "threads_per_process": 4,
+        "total_physical_bytes": 33409208320,
+        "total_thread_ceiling": 8
+      },
+      "process_count": 2,
+      "quality_stable": true,
+      "threads_per_process": 4,
+      "throughput_speedup_vs_1x10": 1.205428,
+      "warm": [
+        {
+          "average_host_cpu_percent": 14.836,
+          "elapsed_seconds": 106.017409,
+          "individual_peak_working_set_bytes": [
+            9091473408,
+            9102680064
+          ],
+          "maximum_memory_load_percent": 80,
+          "minimum_available_physical_bytes": 6483156992,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 18145660928,
+          "process_count": 2,
+          "process_cpu_seconds": 251.65625,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10980,
+          "result_count": 4,
+          "threads_per_process": 4,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 8
+        },
+        {
+          "average_host_cpu_percent": 15.242,
+          "elapsed_seconds": 93.144421,
+          "individual_peak_working_set_bytes": [
+            9102401536,
+            9103638528
+          ],
+          "maximum_memory_load_percent": 81,
+          "minimum_available_physical_bytes": 6258466816,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 18178031616,
+          "process_count": 2,
+          "process_cpu_seconds": 227.15625,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10980,
+          "result_count": 4,
+          "threads_per_process": 4,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 8
+        },
+        {
+          "average_host_cpu_percent": 15.352,
+          "elapsed_seconds": 88.845263,
+          "individual_peak_working_set_bytes": [
+            9091141632,
+            9089794048
+          ],
+          "maximum_memory_load_percent": 80,
+          "minimum_available_physical_bytes": 6578106368,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 17970413568,
+          "process_count": 2,
+          "process_cpu_seconds": 218.234375,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10980,
+          "result_count": 4,
+          "threads_per_process": 4,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 8
+        },
+        {
+          "average_host_cpu_percent": 15.064,
+          "elapsed_seconds": 94.961317,
+          "individual_peak_working_set_bytes": [
+            9092296704,
+            9091932160
+          ],
+          "maximum_memory_load_percent": 80,
+          "minimum_available_physical_bytes": 6412226560,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 18184228864,
+          "process_count": 2,
+          "process_cpu_seconds": 228.875,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10980,
+          "result_count": 4,
+          "threads_per_process": 4,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 8
+        },
+        {
+          "average_host_cpu_percent": 14.802,
+          "elapsed_seconds": 106.248954,
+          "individual_peak_working_set_bytes": [
+            9105915904,
+            9102966784
+          ],
+          "maximum_memory_load_percent": 81,
+          "minimum_available_physical_bytes": 6338293760,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 18208874496,
+          "process_count": 2,
+          "process_cpu_seconds": 251.625,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10980,
+          "result_count": 4,
+          "threads_per_process": 4,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 8
+        }
+      ],
+      "warm_elapsed_median_seconds": 94.961317,
+      "warm_elapsed_range_seconds": [
+        88.845263,
+        106.248954
+      ]
+    },
+    {
+      "cold": {
+        "average_host_cpu_percent": 15.677,
+        "elapsed_seconds": 110.162514,
+        "individual_peak_working_set_bytes": [
+          9099251712,
+          9096507392
+        ],
+        "maximum_memory_load_percent": 82,
+        "minimum_available_physical_bytes": 5990363136,
+        "pages": 4,
+        "peak_combined_working_set_bytes": 18136420352,
+        "process_count": 2,
+        "process_cpu_seconds": 276.328125,
+        "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+        "result_bytes": 10984,
+        "result_count": 4,
+        "threads_per_process": 6,
+        "total_physical_bytes": 33409208320,
+        "total_thread_ceiling": 12
+      },
+      "process_count": 2,
+      "quality_stable": true,
+      "threads_per_process": 6,
+      "throughput_speedup_vs_1x10": 1.066767,
+      "warm": [
+        {
+          "average_host_cpu_percent": 15.738,
+          "elapsed_seconds": 108.834478,
+          "individual_peak_working_set_bytes": [
+            9107202048,
+            9108713472
+          ],
+          "maximum_memory_load_percent": 81,
+          "minimum_available_physical_bytes": 6099836928,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 18163544064,
+          "process_count": 2,
+          "process_cpu_seconds": 274.0625,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10984,
+          "result_count": 4,
+          "threads_per_process": 6,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 12
+        },
+        {
+          "average_host_cpu_percent": 15.815,
+          "elapsed_seconds": 107.99991,
+          "individual_peak_working_set_bytes": [
+            9093505024,
+            9093574656
+          ],
+          "maximum_memory_load_percent": 80,
+          "minimum_available_physical_bytes": 6406565888,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 18079674368,
+          "process_count": 2,
+          "process_cpu_seconds": 273.28125,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10984,
+          "result_count": 4,
+          "threads_per_process": 6,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 12
+        },
+        {
+          "average_host_cpu_percent": 15.814,
+          "elapsed_seconds": 107.304633,
+          "individual_peak_working_set_bytes": [
+            9106018304,
+            9093279744
+          ],
+          "maximum_memory_load_percent": 80,
+          "minimum_available_physical_bytes": 6586167296,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 17954992128,
+          "process_count": 2,
+          "process_cpu_seconds": 271.5,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10984,
+          "result_count": 4,
+          "threads_per_process": 6,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 12
+        },
+        {
+          "average_host_cpu_percent": 16.142,
+          "elapsed_seconds": 99.85661,
+          "individual_peak_working_set_bytes": [
+            9092370432,
+            9090375680
+          ],
+          "maximum_memory_load_percent": 79,
+          "minimum_available_physical_bytes": 6775291904,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 17687764992,
+          "process_count": 2,
+          "process_cpu_seconds": 257.90625,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10984,
+          "result_count": 4,
+          "threads_per_process": 6,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 12
+        },
+        {
+          "average_host_cpu_percent": 16.049,
+          "elapsed_seconds": 101.42005,
+          "individual_peak_working_set_bytes": [
+            9089433600,
+            9103585280
+          ],
+          "maximum_memory_load_percent": 80,
+          "minimum_available_physical_bytes": 6388031488,
+          "pages": 4,
+          "peak_combined_working_set_bytes": 17992069120,
+          "process_count": 2,
+          "process_cpu_seconds": 260.4375,
+          "quality_sha256": "fbb600aa6b6d8ee027a3b47fb20617357ea04e1b51d89af662844b8e3345b934",
+          "result_bytes": 10984,
+          "result_count": 4,
+          "threads_per_process": 6,
+          "total_physical_bytes": 33409208320,
+          "total_thread_ceiling": 12
+        }
+      ],
+      "warm_elapsed_median_seconds": 107.304633,
+      "warm_elapsed_range_seconds": [
+        99.85661,
+        108.834478
+      ]
+    }
+  ],
+  "status": "measured-not-promoted",
+  "warm_repetitions": 5,
+  "winner": null,
+  "winner_gate": "Select only after memory safety, stable quality, and a mixed OCR plus interactive-chat trial pass."
+}

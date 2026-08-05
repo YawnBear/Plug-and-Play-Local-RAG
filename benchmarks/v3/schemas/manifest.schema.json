@@ -1,0 +1,325 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "manifest_kind", "run", "source", "alembic", "dependencies", "containers", "models", "machine", "dataset", "methodology", "samples", "summaries", "secrets_policy", "benchmark_evidence", "retained_evidence"],
+  "properties": {
+    "schema_version": {"const": 2},
+    "manifest_kind": {"enum": ["draft", "accepted"]},
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "created_at", "command"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "command": {"enum": ["python -m benchmarks.v3.harness create-manifest", "python -m benchmarks.v3.runner run [safe-arguments-redacted]"]}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "dirty", "changed_file_count", "content_identity", "reference_tag", "reference_tag_object"],
+      "properties": {
+        "revision": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40,64}$"},
+        "dirty": {"type": ["boolean", "null"]},
+        "changed_file_count": {"type": ["integer", "null"], "minimum": 0},
+        "content_identity": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "reference_tag": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+        "reference_tag_object": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40,64}$"}
+      }
+    },
+    "alembic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["current_revision", "head_revision", "graph", "evidence_command"],
+      "properties": {
+        "current_revision": {"type": ["string", "null"]},
+        "head_revision": {"type": "array", "items": {"type": "string"}},
+        "graph": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["revision", "down_revision"],
+            "properties": {
+              "revision": {"type": "string"},
+              "down_revision": {"type": ["string", "null"]}
+            }
+          }
+        },
+        "evidence_command": {"const": "uv --directory apps/api run alembic current"}
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lock_file", "lock_sha256", "packages"],
+      "properties": {
+        "lock_file": {"const": "apps/api/uv.lock"},
+        "lock_sha256": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+        "packages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "version"],
+            "properties": {"name": {"type": "string"}, "version": {"type": "string"}}
+          }
+        }
+      }
+    },
+    "containers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["compose_file", "images"],
+      "properties": {
+        "compose_file": {"const": "compose.yaml"},
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["reference", "digest"],
+            "properties": {
+              "reference": {"type": "string"},
+              "digest": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"}
+            }
+          }
+        }
+      }
+    },
+    "models": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generation", "embeddings", "reranker", "ocr"],
+      "properties": {
+        "generation": {"$ref": "#/$defs/model"},
+        "embeddings": {"$ref": "#/$defs/model"},
+        "reranker": {"$ref": "#/$defs/model"},
+        "ocr": {"$ref": "#/$defs/model"}
+      }
+    },
+    "machine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "python", "processor", "cpu_count", "power_mode"],
+      "properties": {
+        "os": {"type": "string"},
+        "python": {"type": "string"},
+        "processor": {"type": "string"},
+        "cpu_count": {"type": "integer", "minimum": 0},
+        "power_mode": {"type": "string"}
+      }
+    },
+    "dataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity", "path", "document_count", "digital_count", "scanned_count", "case_count"],
+      "properties": {
+        "identity": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "path": {"type": "string", "pattern": "^(?![A-Za-z]:|/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"},
+        "document_count": {"type": "integer", "minimum": 0},
+        "digital_count": {"type": "integer", "minimum": 0},
+        "scanned_count": {"type": "integer", "minimum": 0},
+        "case_count": {"type": "integer", "minimum": 0},
+        "fixture_manifest_path": {"type": "string", "pattern": "^(?![A-Za-z]:|/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"},
+        "fixture_identity": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "fixture_hashes": {
+          "type": "object",
+          "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "methodology": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["temperature_labels", "queue_labels", "model_residency", "concurrency", "fixed_corpus", "run_procedure", "repetitions", "warmups", "timeout_ms", "percentile_method"],
+      "properties": {
+        "temperature_labels": {"const": ["cold", "warm"]},
+        "queue_labels": {"const": ["queue-free", "contended"]},
+        "model_residency": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["generation", "embeddings", "reranker", "ocr"],
+          "properties": {
+            "generation": {"enum": ["cold", "warm", "mixed", "unknown"]},
+            "embeddings": {"enum": ["cold", "warm", "mixed", "unknown"]},
+            "reranker": {"enum": ["cold", "warm", "mixed", "unknown"]},
+            "ocr": {"enum": ["cold", "warm", "mixed", "unknown"]}
+          }
+        },
+        "concurrency": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["chat_active", "chat_queued", "ingest_workers"],
+          "properties": {
+            "chat_active": {"type": "integer", "minimum": 0},
+            "chat_queued": {"type": "integer", "minimum": 0},
+            "ingest_workers": {"type": "integer", "minimum": 0}
+          }
+        },
+        "fixed_corpus": {"type": "string"},
+        "run_procedure": {"const": "fresh-v3-synthetic-acceptance-v1"},
+        "repetitions": {"const": 5},
+        "warmups": {"const": 1},
+        "timeout_ms": {"type": "integer", "minimum": 1},
+        "percentile_method": {"const": "linear-n-minus-one"}
+      }
+    },
+    "samples": {"$ref": "samples.schema.json"},
+    "summaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(ingest|ocr|embedding|retrieval|rerank|generation|api)\\|(cold|warm)\\|(queue-free|contended)$": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["stage", "temperature", "queue", "count", "success_count", "timeout_count", "elapsed_ms", "first_token_ms", "throughput_items_per_s", "quality"],
+          "properties": {
+            "stage": {"enum": ["ingest", "ocr", "embedding", "retrieval", "rerank", "generation", "api"]},
+            "temperature": {"enum": ["cold", "warm"]},
+            "queue": {"enum": ["queue-free", "contended"]},
+            "count": {"type": "integer", "minimum": 0},
+            "success_count": {"type": "integer", "minimum": 0},
+            "timeout_count": {"type": "integer", "minimum": 0},
+            "elapsed_ms": {"$ref": "#/$defs/percentiles"},
+            "first_token_ms": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/percentiles"}]},
+            "throughput_items_per_s": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/percentiles"}]},
+            "quality": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "retrieval_hit_at_20": {"$ref": "#/$defs/rate"},
+                "rerank_hit_at_6": {"$ref": "#/$defs/rate"},
+                "citation_correct": {"$ref": "#/$defs/correctness"},
+                "abstention_correct": {"$ref": "#/$defs/correctness"},
+                "expected_terms_correct": {"$ref": "#/$defs/correctness"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "secrets_policy": {"const": "numeric-metrics-and-identifiers-only"},
+    "benchmark_evidence": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ed25519_public_key", "fingerprint", "pre_attestation", "post_attestation", "profile_attestations", "executions", "sample_attestations"],
+          "properties": {
+            "ed25519_public_key": {"type": "string"},
+            "fingerprint": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "pre_attestation": {"$ref": "#/$defs/envelope"},
+            "post_attestation": {"$ref": "#/$defs/envelope"},
+            "profile_attestations": {"type": "array", "items": {"$ref": "#/$defs/envelope"}},
+            "executions": {"type": "array", "items": {"$ref": "#/$defs/envelope"}},
+            "sample_attestations": {"type": "array", "items": {"$ref": "#/$defs/envelope"}}
+          }
+        }
+      ]
+    },
+    "retained_evidence": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["alembic", "models", "containers", "schema", "server_build"],
+          "properties": {
+            "alembic": {"$ref": "#/$defs/artifact"},
+            "containers": {"$ref": "#/$defs/artifact"},
+            "schema": {"$ref": "#/$defs/artifact"},
+            "server_build": {"$ref": "#/$defs/artifact"},
+            "models": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["generation", "embeddings", "reranker", "ocr"],
+              "properties": {
+                "generation": {"$ref": "#/$defs/artifact"},
+                "embeddings": {"$ref": "#/$defs/artifact"},
+                "reranker": {"$ref": "#/$defs/artifact"},
+                "ocr": {"$ref": "#/$defs/artifact"}
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"manifest_kind": {"const": "accepted"}}},
+      "then": {
+        "properties": {
+          "samples": {"minItems": 1},
+          "benchmark_evidence": {"type": "object"},
+          "retained_evidence": {"type": "object"},
+          "source": {"properties": {"dirty": {"const": false}, "reference_tag": {"type": "string"}, "reference_tag_object": {"type": "string"}}},
+          "alembic": {"properties": {"current_revision": {"const": "0001_v3_baseline"}, "head_revision": {"const": ["0001_v3_baseline"]}}}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identifier", "installed_evidence"],
+      "properties": {
+        "identifier": {"type": "string"},
+        "installed_evidence": {"type": "string"}
+      }
+    },
+    "percentiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["p50", "p95", "p99"],
+      "properties": {
+        "p50": {"type": ["number", "null"]},
+        "p95": {"type": ["number", "null"]},
+        "p99": {"type": ["number", "null"]}
+      }
+    },
+    "rate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count", "mean"],
+      "properties": {
+        "count": {"type": "integer", "minimum": 0},
+        "mean": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "correctness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count", "correct", "accuracy"],
+      "properties": {
+        "count": {"type": "integer", "minimum": 0},
+        "correct": {"type": "integer", "minimum": 0},
+        "accuracy": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["payload", "signature"],
+      "properties": {
+        "payload": {"type": "object"},
+        "signature": {"type": "string"}
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^(?![A-Za-z]:|/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"},
+        "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

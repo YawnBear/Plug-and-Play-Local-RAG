@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "profiles": [
+    {
+      "id": "personal",
+      "default": true,
+      "audience": "One person operating Local RAG on one Windows PC",
+      "runtime": "packaged",
+      "ingress_mode": "loopback",
+      "browser_origin": "http://127.0.0.1:3000",
+      "authentication_required": true,
+      "caddy_required": false,
+      "lan_dns_required": false,
+      "certificates_required": false,
+      "inbound_firewall_required": false,
+      "dedicated_windows_identities_required": false,
+      "stores": ["postgresql_pgvector", "rustfs"],
+      "administration": "owner_system"
+    },
+    {
+      "id": "team_lan",
+      "default": false,
+      "audience": "Several trusted users sharing a hardened private-LAN deployment",
+      "runtime": "managed_windows",
+      "ingress_mode": "private_lan_https",
+      "browser_origin": "https://rag.home.arpa",
+      "authentication_required": true,
+      "caddy_required": true,
+      "lan_dns_required": true,
+      "certificates_required": true,
+      "inbound_firewall_required": true,
+      "dedicated_windows_identities_required": true,
+      "stores": ["postgresql_pgvector", "rustfs"],
+      "administration": "full_system"
+    },
+    {
+      "id": "contributor",
+      "default": false,
+      "audience": "Developers running and changing the source tree",
+      "runtime": "source_tree",
+      "ingress_mode": "development_loopback",
+      "browser_origin": "http://127.0.0.1:3000",
+      "authentication_required": true,
+      "caddy_required": false,
+      "lan_dns_required": false,
+      "certificates_required": false,
+      "inbound_firewall_required": false,
+      "dedicated_windows_identities_required": false,
+      "stores": ["postgresql_pgvector", "rustfs"],
+      "administration": "developer_tools"
+    }
+  ]
+}

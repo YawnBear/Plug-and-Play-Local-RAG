@@ -1,0 +1,4 @@
+{"samples": [
+  {"sample_id": "synthetic-generation-cold-free-01", "stage": "generation", "temperature": "cold", "queue": "queue-free", "elapsed_ms": 1200, "first_token_ms": 300, "success": true, "repetition": 1},
+  {"sample_id": "synthetic-generation-warm-free-01", "stage": "generation", "temperature": "warm", "queue": "queue-free", "elapsed_ms": 800, "first_token_ms": 180, "success": true, "repetition": 1}
+]}

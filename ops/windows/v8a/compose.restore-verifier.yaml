@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.5-pg18-bookworm@sha256:766437bbab40c7d0b080d380e2976f9ca2e880ce8fe7544c60e832eceaf43c1c
+    restart: "no"
+    labels:
+      com.localrag.profile: personal-restore-verifier
+      com.localrag.verification-id: ${RAG_VERIFY_ID:?Missing verification ID}
+    environment:
+      POSTGRES_DB: rag
+      POSTGRES_USER: rag_cluster_admin
+      POSTGRES_PASSWORD: ${POSTGRES_CLUSTER_ADMIN_PASSWORD:?Missing PostgreSQL secret}
+    ports:
+      - target: 5432
+        published: "0"
+        host_ip: 127.0.0.1
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: ${RAG_VERIFY_POSTGRES_DATA:?Missing PostgreSQL data path}
+        target: /var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag_cluster_admin -d rag"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+      start_period: 15s
+
+  rustfs:
+    image: rustfs/rustfs:1.0.0-beta.10@sha256:60f4f2f41ce95216f8cac676e69f9d90c0bfec458a3bc7fd7fb9b7c2452ac57a
+    restart: "no"
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      com.localrag.profile: personal-restore-verifier
+      com.localrag.verification-id: ${RAG_VERIFY_ID:?Missing verification ID}
+    environment:
+      RUSTFS_VOLUMES: /data
+      RUSTFS_ADDRESS: 0.0.0.0:9000
+      RUSTFS_CONSOLE_ENABLE: "false"
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ROOT_ACCESS_KEY:?Missing RustFS access key}
+      RUSTFS_SECRET_KEY: ${RUSTFS_ROOT_SECRET_KEY:?Missing RustFS secret key}
+    command: ["rustfs"]
+    ports:
+      - target: 9000
+        published: "0"
+        host_ip: 127.0.0.1
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: ${RAG_VERIFY_RUSTFS_DATA:?Missing RustFS data path}
+        target: /data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:9000/health"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+      start_period: 5s

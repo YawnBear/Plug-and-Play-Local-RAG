@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-rag.invalid/schemas/v8a/release-trust-metadata.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_id",
+    "root_id",
+    "release_id",
+    "release_sequence",
+    "issued_at",
+    "expires_at",
+    "artifacts_sha256",
+    "revoked_release_ids",
+    "revoked_profile_ids"
+  ],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "policy_id": {"type": "string", "const": "local-rag-v8-release-trust"},
+    "root_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{5,63}$"},
+    "release_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{5,127}$"},
+    "release_sequence": {"type": "integer", "minimum": 1},
+    "issued_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+    "expires_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+    "artifacts_sha256": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "required": ["personal-release.json", "product-profiles.json", "capability-profiles.json"],
+      "properties": {
+        "personal-release.json": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "product-profiles.json": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "capability-profiles.json": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "revoked_release_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{5,127}$"}
+    },
+    "revoked_profile_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,95}$"}
+    }
+  }
+}

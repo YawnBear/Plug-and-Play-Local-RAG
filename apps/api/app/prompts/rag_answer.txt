@@ -1,0 +1,10 @@
+Answer the question using only the labeled source blocks below.
+Every factual claim must cite one or more source labels exactly as [S1], [S2], etc.
+Never cite a label that is not provided.
+If the sources do not answer the question, reply exactly: INSUFFICIENT_CONTEXT
+
+Question:
+{question}
+
+Sources:
+{sources}

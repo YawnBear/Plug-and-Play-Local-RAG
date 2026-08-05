@@ -1,0 +1,18 @@
+{
+  "corpus_identity": "65e323908a429f7e1fb54f3e8df860cfaf5ff004a8ef2a9d0cc2d6e9d4461105",
+  "dataset_id": "v3-synthetic-en-first-001",
+  "documents": {
+    "syn-digital-01": "abf9e12c63923e4f842d4d174410d70f4dec11f0d7e0bb266b916fd8c371491a",
+    "syn-digital-02": "71e2db5d15097de9c12ccfe5f8b85c0bb99618774e45be89083bee963757b87e",
+    "syn-digital-03": "5b2b416e2649d0f0cddc1c5698ed2f41949113b93d3f6a3365cc7ddf1733081e",
+    "syn-digital-04": "e29fc25758a8e47ec2c7ac9a4eb95c6a630b5cc3ff2f58a8950906e879ae64d9",
+    "syn-digital-05": "3a3dd896051120f55ab527e60232cf98ebe6c9498277ec0d362a19d1bdb10006",
+    "syn-digital-06": "b3c43e3c59f0988ecdff2d84772d04aa3700ad6a126cdb24cbfd99c8da239a28",
+    "syn-digital-07": "60546c22edef3aea1df70cddfe2f4a42997ae180cc2e553aa84779f71c272f50",
+    "syn-digital-08": "771ca36ba0de7062fff249d5051bfee7d15e0d999456b154b2689a3c48439cf7",
+    "syn-scanned-01": "81c69f24d0327f1298c579ea046ae6fe1b00665bed0b4f4dc7703cc6db781524",
+    "syn-scanned-02": "943c00a1dc49099cdd2f76fe0584a49f1052c7f622987ab0c6c430dedd492803"
+  },
+  "evaluation_identity": "c55aba3c81cde1d53a1d9c572f78bd214ccef4db897d93f6bd83393c11ceca54",
+  "schema_version": 1
+}

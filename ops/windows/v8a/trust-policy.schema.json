@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local-rag.invalid/schemas/v8a/trust-policy.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_id",
+    "production_signature_required",
+    "production_signing_milestone",
+    "trust_anchor_state",
+    "development_mode",
+    "metadata",
+    "rotation",
+    "revocation"
+  ],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "policy_id": {"type": "string", "const": "local-rag-v8-release-trust"},
+    "production_signature_required": {"type": "boolean", "const": true},
+    "production_signing_milestone": {"type": "string", "const": "V8F"},
+    "trust_anchor_state": {"type": "string", "const": "v8f_required"},
+    "development_mode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["explicit_source_switch", "ephemeral_test_keys_only", "production_key_forbidden"],
+      "properties": {
+        "explicit_source_switch": {"type": "boolean", "const": true},
+        "ephemeral_test_keys_only": {"type": "boolean", "const": true},
+        "production_key_forbidden": {"type": "boolean", "const": true}
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maximum_lifetime_days", "release_sequence_required", "anti_rollback_required", "exact_artifact_set_required"],
+      "properties": {
+        "maximum_lifetime_days": {"type": "integer", "minimum": 1, "maximum": 90},
+        "release_sequence_required": {"type": "boolean", "const": true},
+        "anti_rollback_required": {"type": "boolean", "const": true},
+        "exact_artifact_set_required": {"type": "boolean", "const": true}
+      }
+    },
+    "rotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cross_signature_required", "old_root_authorizes_new_root"],
+      "properties": {
+        "cross_signature_required": {"type": "boolean", "const": true},
+        "old_root_authorizes_new_root": {"type": "boolean", "const": true}
+      }
+    },
+    "revocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["release_ids", "profile_ids", "fail_closed"],
+      "properties": {
+        "release_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}},
+        "profile_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}},
+        "fail_closed": {"type": "boolean", "const": true}
+      }
+    }
+  }
+}

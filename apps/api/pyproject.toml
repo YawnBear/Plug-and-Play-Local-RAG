@@ -1,0 +1,53 @@
+[project]
+name = "rag-api"
+version = "0.1.0"
+description = "FastAPI backend for the RAG application"
+readme = { file = "README", content-type = "text/plain" }
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.16.4,<2.0.0",
+    "argon2-cffi>=25.1.0,<26.0.0",
+    "boto3>=1.40.0,<2.0.0",
+    "fastapi[standard]>=0.116.0,<1.0.0",
+    "httpx>=0.28.0,<1.0.0",
+    "pgvector>=0.4.1,<1.0.0",
+    "psycopg[binary]>=3.2.9,<4.0.0",
+    "pydantic-settings>=2.10.0,<3.0.0",
+    "pypdf>=6.1.0,<7.0.0",
+    "python-multipart>=0.0.20,<1.0.0",
+    "safetensors>=0.5.3,<1.0.0",
+    "sentencepiece>=0.2.0,<1.0.0",
+    "sqlalchemy>=2.0.41,<3.0.0",
+    "torch>=2.7.0",
+    "transformers>=4.53.0,<6.0.0",
+    "uvicorn[standard]>=0.35.0,<1.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.0,<9.0.0",
+    "ruff>=0.12.0,<1.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-m 'not integration'"
+markers = [
+    "integration: requires the explicitly configured PostgreSQL test database",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
