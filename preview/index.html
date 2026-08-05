@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Interactive frontend-only preview of Local RAG." />
+    <meta name="color-scheme" content="light dark" />
+    <title>Local RAG — Interactive preview</title>
+    <link rel="stylesheet" href="./product.css" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script>
+      (() => {
+        try {
+          const saved = localStorage.getItem("local-rag-preview-theme");
+          const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.dataset.theme = saved || (dark ? "dark" : "light");
+        } catch {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="app-shell" style="--primary-sidebar-width: 220px">
+      <a class="skip-link" href="#main-content">Skip to main content</a>
+
+      <aside class="activity-bar" aria-label="Application activity">
+        <button class="activity-bar__brand" type="button" aria-label="About this preview" data-open-about>LR</button>
+        <nav aria-label="Workspace">
+          <button class="activity-bar__item" type="button" aria-label="Chat" aria-current="page" data-view="chat">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 18.5 3.5 21v-5.2A8 8 0 1 1 7 18.5Z" /></svg>
+          </button>
+          <button class="activity-bar__item" type="button" aria-label="Knowledge Base" data-view="knowledge">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z" /><path d="M4 5.5A2.5 2.5 0 0 0 6.5 8H20" /></svg>
+          </button>
+          <button class="activity-bar__item" type="button" aria-label="Administration" data-demo-action="Administration is read-only in preview mode.">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" /></svg>
+          </button>
+          <button class="activity-bar__item" type="button" aria-label="System" data-view="system">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="13" rx="1" /><path d="M8 22h8M12 18v4" /></svg>
+          </button>
+        </nav>
+        <div class="activity-bar__spacer"></div>
+        <button class="account-avatar preview-account" type="button" aria-label="Switch theme" data-theme-toggle>D</button>
+      </aside>
+
+      <aside class="primary-sidebar" aria-label="Chat sidebar" data-motion="open">
+        <div class="primary-sidebar__header">
+          <strong data-sidebar-title>Chat</strong>
+          <button class="primary-sidebar__toggle" type="button" aria-label="Preview sidebar is fixed" data-demo-action="The production sidebar can be resized and hidden.">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 6 3 12l6 6M3 12h15M18 5v14" /></svg>
+          </button>
+        </div>
+
+        <button class="sidebar__new-chat" type="button" data-new-chat>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+          <span>New chat</span>
+        </button>
+
+        <div class="primary-sidebar__content">
+          <section class="conversation-history" aria-labelledby="history-title" data-sidebar-panel="chat">
+            <div class="conversation-history__heading"><h2 id="history-title">Conversations</h2></div>
+            <label class="conversation-search">
+              <span class="sr-only">Search conversations by title</span>
+              <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m16 16 4 4" /></svg>
+              <input type="search" placeholder="Search chats" data-chat-search />
+            </label>
+            <div class="conversation-groups">
+              <section class="conversation-group" aria-labelledby="group-title">
+                <h3 class="conversation-group__title" id="group-title">Yesterday</h3>
+                <ul class="conversation-list">
+                  <li class="conversation-item">
+                    <button class="conversation-item__open" type="button" aria-current="page" data-conversation="policy"><span>Remote work policy</span></button>
+                  </li>
+                  <li class="conversation-item">
+                    <button class="conversation-item__open" type="button" data-conversation="security"><span>Security onboarding</span></button>
+                  </li>
+                  <li class="conversation-item">
+                    <button class="conversation-item__open" type="button" data-conversation="expenses"><span>Travel expenses</span></button>
+                  </li>
+                </ul>
+                <p class="conversation-history__empty" data-chat-empty hidden>No chat titles match.</p>
+              </section>
+            </div>
+          </section>
+
+          <nav class="workspace-section-nav" aria-label="Knowledge Base" data-sidebar-panel="knowledge" hidden>
+            <button class="workspace-section-nav__link" type="button" aria-current="page">All documents</button>
+            <button class="workspace-section-nav__link" type="button">Company policies</button>
+            <button class="workspace-section-nav__link" type="button">Security</button>
+          </nav>
+
+          <nav class="workspace-section-nav" aria-label="System" data-sidebar-panel="system" hidden>
+            <button class="workspace-section-nav__link" type="button" aria-current="page">Overview</button>
+            <button class="workspace-section-nav__link" type="button">AI Models</button>
+            <button class="workspace-section-nav__link" type="button">OCR</button>
+            <button class="workspace-section-nav__link" type="button">Maintenance</button>
+          </nav>
+        </div>
+        <div class="primary-sidebar__resize" role="separator" aria-label="Resize sidebar"></div>
+      </aside>
+
+      <header class="mobile-context-bar">
+        <button class="icon-button" type="button" aria-label="Open navigation" data-open-mobile>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        </button>
+        <div class="mobile-context-bar__identity"><button class="sidebar__mark" type="button" aria-label="About this preview" data-open-about>LR</button><strong data-mobile-title>Chat</strong></div>
+      </header>
+
+      <main id="main-content" class="app-main" tabindex="-1">
+        <section class="view-panel" data-view-panel="chat">
+          <div class="chat-workspace">
+            <div class="chat-workspace__inner">
+              <div class="chat-workspace__column">
+                <header class="conversation-header">
+                  <div class="conversation-header__copy">
+                    <h1 data-chat-title>Remote work policy</h1>
+                    <p>Local evidence · Only committed final answers are verified</p>
+                  </div>
+                  <button class="scope-trigger" type="button" data-demo-action="This preview uses all six ready sample files.">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM9 8h6M9 12h6M9 16h4" /></svg>
+                    <span>All ready files</span>
+                  </button>
+                </header>
+
+                <section class="transcript" aria-label="Conversation transcript">
+                  <div class="transcript__scroll" data-transcript>
+                    <article class="chat-turn">
+                      <div class="chat-turn__question"><p>How many days can employees work remotely, and who approves exceptions?</p></div>
+                      <div class="chat-turn__answer">
+                        <div class="chat-turn__status">
+                          <span class="trust-status trust-status--verified">
+                            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m7 12 3 3 7-7" /></svg>
+                            Verified
+                          </span>
+                        </div>
+                        <div class="chat-turn__output markdown-output">
+                          <p>Employees may work remotely for up to <strong>three days per week</strong>, provided their team maintains agreed coverage and the arrangement is documented with their manager <button class="inline-citation" type="button" data-source="S1">[S1]</button>.</p>
+                          <p>Exceptions beyond three days require approval from both the employee's department head and People Operations. The policy recommends reviewing every exception after 90 days <button class="inline-citation" type="button" data-source="S2">[S2]</button>.</p>
+                        </div>
+                        <section class="source-list" aria-label="Citations">
+                          <div class="source-list__heading"><h3>Citations</h3></div>
+                          <ol>
+                            <li><button class="source-card" type="button" data-source="S1"><span class="source-card__label">S1</span><span class="source-card__body"><strong>Remote Work Policy.pdf</strong><span>/Company policies/Remote Work Policy.pdf · Flexible work arrangements</span></span><span class="source-card__page">Page 4</span></button></li>
+                            <li><button class="source-card" type="button" data-source="S2"><span class="source-card__label">S2</span><span class="source-card__body"><strong>People Handbook.pdf</strong><span>/Company policies/People Handbook.pdf · Employment practices</span></span><span class="source-card__page">Page 18</span></button></li>
+                          </ol>
+                        </section>
+                      </div>
+                    </article>
+                  </div>
+                </section>
+
+                <form class="chat-composer" data-composer>
+                  <div class="chat-composer__surface">
+                    <label class="sr-only" for="demo-question">Question</label>
+                    <textarea id="demo-question" class="chat-composer__input" rows="1" placeholder="Ask your knowledge base" data-question-input></textarea>
+                    <div class="chat-composer__footer">
+                      <p class="chat-composer__help" data-composer-help>Enter to send · Shift+Enter for a new line · 0/2,000</p>
+                      <button class="chat-composer__send" type="submit" aria-label="Send" disabled>
+                        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view-panel preview-workspace" data-view-panel="knowledge" hidden>
+          <header><div><p class="route-state__eyebrow">Sample library</p><h1>Knowledge Base</h1><p>Manage searchable PDFs and their access from the same production workspace.</p></div><button class="button-primary" type="button" data-demo-action="Uploads are disabled in preview mode.">Upload PDF</button></header>
+          <div class="preview-grid">
+            <article><span>Ready documents</span><strong>6</strong><small>All searchable</small></article>
+            <article><span>Indexed pages</span><strong>184</strong><small>1,247 chunks</small></article>
+            <article><span>Storage</span><strong>38.4 MB</strong><small>Local device</small></article>
+          </div>
+          <section class="preview-table" aria-label="Sample documents">
+            <div class="preview-table__header"><strong>Name</strong><strong>Status</strong></div>
+            <button type="button"><span><b>PDF</b><span><strong>Remote Work Policy.pdf</strong><small>12 pages · 48 chunks</small></span></span><span class="ready-badge">Ready</span></button>
+            <button type="button"><span><b>PDF</b><span><strong>People Handbook.pdf</strong><small>64 pages · 382 chunks</small></span></span><span class="ready-badge">Ready</span></button>
+            <button type="button"><span><b>PDF</b><span><strong>Security Onboarding.pdf</strong><small>22 pages · 126 chunks</small></span></span><span class="ready-badge">Ready</span></button>
+          </section>
+        </section>
+
+        <section class="view-panel preview-workspace" data-view-panel="system" hidden>
+          <header><div><p class="route-state__eyebrow">Local runtime</p><h1>System overview</h1><p>Exact model identities and sanitized service health.</p></div><span class="healthy-badge"><i></i>All services healthy</span></header>
+          <section class="preview-system-card">
+            <h2>Private AI stack</h2>
+            <div class="preview-services">
+              <div><b>AI</b><span><strong>Answer generation</strong><small>qwen3:8b · Ollama</small></span><em>Healthy</em></div>
+              <div><b>EM</b><span><strong>Embeddings</strong><small>qwen3-embedding:0.6b · 1,024 dimensions</small></span><em>Healthy</em></div>
+              <div><b>RR</b><span><strong>Reranking</strong><small>BAAI/bge-reranker-v2-m3 · CPU</small></span><em>Healthy</em></div>
+              <div><b>OC</b><span><strong>Document parsing</strong><small>PaddleOCR-VL 1.6 · CPU</small></span><em>Healthy</em></div>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <dialog class="preview-dialog" data-about-dialog>
+      <div class="dialog-header"><div><p class="route-state__eyebrow">Frontend-only tour</p><h2>Preview mode</h2></div><button type="button" data-close-about>Close</button></div>
+      <p>This static preview uses fictional documents and built-in answers. It makes no API requests and does not upload data.</p>
+      <p>The installed application uses the same production interface with your local API, database, document store, and models.</p>
+      <div class="dialog-actions"><a class="button-secondary" href="https://github.com/YawnBear/Plug-and-Play-Local-RAG" target="_blank" rel="noreferrer">View source</a><button class="button-primary" type="button" data-close-about>Continue preview</button></div>
+    </dialog>
+
+    <dialog class="drawer drawer--right preview-citation" data-source-drawer>
+      <div class="dialog-header"><div><p class="route-state__eyebrow">Verified citation</p><h2 data-source-label>Source S1</h2></div><button type="button" data-close-source>Close</button></div>
+      <div class="citation-preview">
+        <div class="citation-preview__metadata"><span class="citation-preview__page" data-source-page>Page 4</span><p data-source-path>/Company policies/Remote Work Policy.pdf</p><p>Section: <span data-source-section>Flexible work arrangements</span></p></div>
+        <section class="citation-evidence"><h3>Cited chunk</h3><mark data-source-quote>Eligible employees may work remotely for up to three days in a standard work week when team coverage is maintained.</mark></section>
+        <div class="citation-preview__actions"><button class="button-primary" type="button" data-open-knowledge>Open in Knowledge Base</button></div>
+      </div>
+    </dialog>
+
+    <div class="toast" role="status" aria-live="polite" data-toast></div>
+    <script src="./app.js"></script>
+  </body>
+</html>

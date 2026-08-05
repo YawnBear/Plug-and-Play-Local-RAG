@@ -1,0 +1,222 @@
+/* Preview-only additions. The product UI itself is styled by apps/web/app/globals.css. */
+
+body { overflow: hidden; }
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+button.activity-bar__item,
+button.activity-bar__brand,
+.preview-account {
+  padding: 0;
+  border: 0;
+}
+
+.preview-account {
+  width: 34px;
+  height: 34px;
+  min-height: 34px;
+  margin: 4px auto 10px;
+  border-radius: 50%;
+}
+
+.primary-sidebar .sidebar__new-chat,
+.workspace-section-nav__link {
+  border: 0;
+  text-align: left;
+}
+
+.conversation-item__open { width: 100%; }
+
+.view-panel {
+  height: 100dvh;
+}
+
+.view-panel[hidden],
+[data-sidebar-panel][hidden] {
+  display: none !important;
+}
+
+.inline-citation {
+  min-height: 24px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 12px;
+}
+
+.inline-citation:hover { filter: brightness(0.92); }
+
+.preview-dialog {
+  border-radius: 14px;
+}
+
+.preview-dialog p {
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.preview-dialog .dialog-actions a { text-decoration: none; }
+
+.preview-citation[open] {
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0;
+}
+
+.preview-citation .dialog-header button {
+  min-height: 36px;
+  padding: 6px 10px;
+}
+
+.preview-workspace {
+  padding: clamp(28px, 5vw, 64px);
+  overflow-y: auto;
+}
+
+.preview-workspace > header {
+  display: flex;
+  max-width: 1000px;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0 auto 28px;
+}
+
+.preview-workspace > header h1 { margin: 0; }
+.preview-workspace > header p:last-child { margin: 8px 0 0; color: var(--muted-foreground); }
+
+.preview-grid {
+  display: grid;
+  max-width: 1000px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 0 auto 18px;
+}
+
+.preview-grid article,
+.preview-table,
+.preview-system-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.preview-grid article {
+  display: flex;
+  min-height: 124px;
+  flex-direction: column;
+  padding: 18px;
+}
+
+.preview-grid article span,
+.preview-grid article small { color: var(--muted-foreground); font-size: 11px; }
+.preview-grid article strong { margin: auto 0 2px; font-family: "IBM Plex Mono", Consolas, monospace; font-size: 26px; }
+
+.preview-table,
+.preview-system-card { max-width: 1000px; margin: 0 auto; overflow: hidden; }
+.preview-table__header,
+.preview-table > button { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 12px 16px; }
+.preview-table__header { background: var(--surface-subtle); color: var(--muted-foreground); font-size: 11px; }
+.preview-table > button { width: 100%; min-height: 68px; border: 0; border-top: 1px solid var(--border); background: transparent; text-align: left; }
+.preview-table > button:hover { background: var(--surface-hover); }
+.preview-table > button > span:first-child { display: flex; align-items: center; gap: 12px; }
+.preview-table > button b,
+.preview-services b { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 8px; background: var(--accent-soft); color: var(--accent); font-family: "IBM Plex Mono", Consolas, monospace; font-size: 9px; }
+.preview-table > button > span > span { display: flex; flex-direction: column; }
+.preview-table small,
+.preview-services small { color: var(--muted-foreground); font-size: 11px; }
+
+.ready-badge,
+.healthy-badge {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--success-soft);
+  color: var(--success);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.healthy-badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
+.preview-system-card { padding: 22px; }
+.preview-system-card h2 { margin: 0 0 16px; }
+.preview-services { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.preview-services > div { display: grid; min-width: 0; grid-template-columns: 36px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--background); }
+.preview-services > div > span { display: flex; min-width: 0; flex-direction: column; }
+.preview-services em { color: var(--success); font-size: 10px; font-style: normal; font-weight: 700; }
+
+.mobile-context-bar .sidebar__mark {
+  padding: 0;
+  border: 0;
+}
+
+.toast {
+  position: fixed;
+  z-index: 120;
+  right: 20px;
+  bottom: 20px;
+  max-width: min(360px, calc(100% - 40px));
+  padding: 10px 14px;
+  transform: translateY(16px);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--foreground);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 18%);
+  color: var(--background);
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+
+.toast.is-visible { transform: translateY(0); opacity: 1; }
+
+@media (max-width: 1023px) {
+  body { overflow: auto; }
+  .view-panel { height: calc(100dvh - 56px); }
+  .preview-workspace { padding: 24px 18px 48px; }
+}
+
+@media (max-width: 640px) {
+  .preview-grid,
+  .preview-services { grid-template-columns: 1fr; }
+  .preview-workspace > header { align-items: stretch; flex-direction: column; }
+  .preview-workspace > header .button-primary { width: 100%; }
+  .source-card__body span { max-width: 42vw; }
+  .source-card__page { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
