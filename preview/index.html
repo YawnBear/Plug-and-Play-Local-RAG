@@ -6,8 +6,8 @@
     <meta name="description" content="Interactive frontend-only preview of Local RAG." />
     <meta name="color-scheme" content="light dark" />
     <title>Local RAG — Interactive preview</title>
-    <link rel="stylesheet" href="./product.css" />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./product.css?v=4" />
+    <link rel="stylesheet" href="./styles.css?v=4" />
     <script>
       (() => {
         try {
@@ -26,16 +26,16 @@
         <button class="activity-bar__brand" type="button" aria-label="About this preview" data-open-about>LR</button>
         <nav aria-label="Workspace">
           <button class="activity-bar__item" type="button" aria-label="Chat" aria-current="page" data-view="chat">
-            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 18.5 3.5 21v-5.2A8 8 0 1 1 7 18.5Z" /></svg>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 18.5 3.5 21l4-1.2A9 9 0 1 0 5 18.5Z" /></svg>
           </button>
           <button class="activity-bar__item" type="button" aria-label="Knowledge Base" data-view="knowledge">
-            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z" /><path d="M4 5.5A2.5 2.5 0 0 0 6.5 8H20" /></svg>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5v-16ZM20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5v-16Z" /></svg>
           </button>
           <button class="activity-bar__item" type="button" aria-label="Administration" data-demo-action="Administration is read-only in preview mode.">
-            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" /></svg>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20v-7h6v7M14 20v-4h6v4M4 9V4h6v5M14 12V4h6v8" /></svg>
           </button>
           <button class="activity-bar__item" type="button" aria-label="System" data-view="system">
-            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="13" rx="1" /><path d="M8 22h8M12 18v4" /></svg>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4" /></svg>
           </button>
         </nav>
         <div class="activity-bar__spacer"></div>
@@ -46,7 +46,7 @@
         <div class="primary-sidebar__header">
           <strong data-sidebar-title>Chat</strong>
           <button class="primary-sidebar__toggle" type="button" aria-label="Preview sidebar is fixed" data-demo-action="The production sidebar can be resized and hidden.">
-            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 6 3 12l6 6M3 12h15M18 5v14" /></svg>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5h16M4 12h10M4 19h16" /><path d="m18 9-3 3 3 3" /></svg>
           </button>
         </div>
 
@@ -82,11 +82,62 @@
             </div>
           </section>
 
-          <nav class="workspace-section-nav" aria-label="Knowledge Base" data-sidebar-panel="knowledge" hidden>
-            <button class="workspace-section-nav__link" type="button" aria-current="page">All documents</button>
-            <button class="workspace-section-nav__link" type="button">Company policies</button>
-            <button class="workspace-section-nav__link" type="button">Security</button>
-          </nav>
+          <section class="kb-explorer" aria-labelledby="kb-explorer-title" data-sidebar-panel="knowledge" hidden>
+            <div class="kb-explorer__header">
+              <div><h2 id="kb-explorer-title">Local PDF Library</h2></div>
+              <div class="kb-explorer__tools">
+                <span class="tooltip"><button type="button" aria-label="Upload PDF" data-demo-action="Uploads are disabled in preview mode."><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16" /></svg></button></span>
+                <span class="tooltip"><button type="button" aria-label="New folder" data-demo-action="Folder changes are disabled in preview mode."><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg></button></span>
+                <span class="tooltip"><button type="button" aria-label="Refresh explorer" data-demo-action="The fictional library is already up to date."><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.7-4.3L3 9M4 13a8 8 0 0 0 14.7 4.3L21 15" /><path d="M3 4v5h5M21 20v-5h-5" /></svg></button></span>
+                <span class="tooltip"><button type="button" aria-label="Collapse all folders" data-kb-collapse><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m8 9 4-4 4 4M8 15l4 4 4-4" /><path d="M4 12h16" /></svg></button></span>
+              </div>
+            </div>
+            <div class="kb-explorer__tree" role="tree" aria-label="Knowledge base files">
+              <div class="kb-explorer__row" role="treeitem" aria-level="1" aria-expanded="true" aria-selected="true" data-expanded-children="true" style="padding-inline-start: 2px; --kb-explorer-node-x: 17px" data-kb-row="root">
+                <button class="kb-explorer__chevron" type="button" tabindex="-1" aria-label="Collapse Root" data-kb-toggle="root"><svg class="rotate-90 transition-transform" aria-hidden="true" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" /></svg></button>
+                <button class="kb-explorer__label" type="button" tabindex="-1" data-kb-folder="Root"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6.5h7l2 2h9v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg><span>Root</span></button>
+                <button class="kb-explorer__more" type="button" tabindex="-1" aria-label="Actions for Root" data-demo-action="Library actions are disabled in preview mode."><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" /></svg></button>
+              </div>
+              <div data-kb-children="root">
+                <div class="kb-explorer__row" role="treeitem" aria-level="2" aria-expanded="false" aria-selected="false" style="padding-inline-start: 16px; --kb-explorer-node-x: 31px" data-kb-row="policies">
+                  <span class="kb-explorer__guide" aria-hidden="true" style="left: 17px"></span>
+                  <button class="kb-explorer__chevron" type="button" tabindex="-1" aria-label="Expand Company policies" data-kb-toggle="policies"><svg class="transition-transform" aria-hidden="true" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" /></svg></button>
+                  <button class="kb-explorer__label" type="button" tabindex="-1" data-kb-folder="Company policies"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6.5h7l2 2h9v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg><span>Company policies</span></button>
+                  <button class="kb-explorer__more" type="button" tabindex="-1" aria-label="Actions for Company policies" data-demo-action="Library actions are disabled in preview mode."><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" /></svg></button>
+                </div>
+                <div data-kb-children="policies" hidden>
+                  <div class="kb-explorer__row" role="treeitem" aria-level="3" aria-selected="false" style="padding-inline-start: 30px; --kb-explorer-node-x: 45px" data-kb-row="remote-work">
+                    <span class="kb-explorer__guide" aria-hidden="true" style="left: 17px"></span><span class="kb-explorer__guide" aria-hidden="true" style="left: 31px"></span><span class="kb-explorer__chevron" aria-hidden="true"></span>
+                    <button class="kb-explorer__label" type="button" tabindex="-1" data-kb-document="Remote Work Policy.pdf"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z" /><path d="M14 3v5h5M9 13h6M9 17h5" /></svg><span>Remote Work Policy.pdf</span><small>ready</small></button>
+                    <button class="kb-explorer__more" type="button" tabindex="-1" aria-label="Actions for Remote Work Policy.pdf" data-demo-action="Document actions are disabled in preview mode."><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" /></svg></button>
+                  </div>
+                  <div class="kb-explorer__row" role="treeitem" aria-level="3" aria-selected="false" style="padding-inline-start: 30px; --kb-explorer-node-x: 45px" data-kb-row="handbook">
+                    <span class="kb-explorer__guide" aria-hidden="true" style="left: 17px"></span><span class="kb-explorer__guide" aria-hidden="true" style="left: 31px"></span><span class="kb-explorer__chevron" aria-hidden="true"></span>
+                    <button class="kb-explorer__label" type="button" tabindex="-1" data-kb-document="People Handbook.pdf"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z" /><path d="M14 3v5h5M9 13h6M9 17h5" /></svg><span>People Handbook.pdf</span><small>ready</small></button>
+                    <button class="kb-explorer__more" type="button" tabindex="-1" aria-label="Actions for People Handbook.pdf" data-demo-action="Document actions are disabled in preview mode."><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" /></svg></button>
+                  </div>
+                  <div class="kb-explorer__row" role="treeitem" aria-level="3" aria-selected="false" style="padding-inline-start: 30px; --kb-explorer-node-x: 45px" data-kb-row="expenses">
+                    <span class="kb-explorer__guide" aria-hidden="true" style="left: 17px"></span><span class="kb-explorer__guide" aria-hidden="true" style="left: 31px"></span><span class="kb-explorer__chevron" aria-hidden="true"></span>
+                    <button class="kb-explorer__label" type="button" tabindex="-1" data-kb-document="Travel &amp; Expenses.pdf"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z" /><path d="M14 3v5h5M9 13h6M9 17h5" /></svg><span>Travel &amp; Expenses.pdf</span><small>ready</small></button>
+                    <button class="kb-explorer__more" type="button" tabindex="-1" aria-label="Actions for Travel &amp; Expenses.pdf" data-demo-action="Document actions are disabled in preview mode."><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" /></svg></button>
+                  </div>
+                </div>
+                <div class="kb-explorer__row" role="treeitem" aria-level="2" aria-expanded="false" aria-selected="false" style="padding-inline-start: 16px; --kb-explorer-node-x: 31px" data-kb-row="security">
+                  <span class="kb-explorer__guide" aria-hidden="true" style="left: 17px"></span>
+                  <button class="kb-explorer__chevron" type="button" tabindex="-1" aria-label="Expand Security" data-kb-toggle="security"><svg class="transition-transform" aria-hidden="true" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" /></svg></button>
+                  <button class="kb-explorer__label" type="button" tabindex="-1" data-kb-folder="Security"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6.5h7l2 2h9v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg><span>Security</span></button>
+                  <button class="kb-explorer__more" type="button" tabindex="-1" aria-label="Actions for Security" data-demo-action="Library actions are disabled in preview mode."><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" /></svg></button>
+                </div>
+                <div data-kb-children="security" hidden>
+                  <div class="kb-explorer__row" role="treeitem" aria-level="3" aria-selected="false" style="padding-inline-start: 30px; --kb-explorer-node-x: 45px" data-kb-row="security-onboarding">
+                    <span class="kb-explorer__guide" aria-hidden="true" style="left: 17px"></span><span class="kb-explorer__guide" aria-hidden="true" style="left: 31px"></span><span class="kb-explorer__chevron" aria-hidden="true"></span>
+                    <button class="kb-explorer__label" type="button" tabindex="-1" data-kb-document="Security Onboarding.pdf"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z" /><path d="M14 3v5h5M9 13h6M9 17h5" /></svg><span>Security Onboarding.pdf</span><small>ready</small></button>
+                    <button class="kb-explorer__more" type="button" tabindex="-1" aria-label="Actions for Security Onboarding.pdf" data-demo-action="Document actions are disabled in preview mode."><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" /></svg></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
 
           <nav class="workspace-section-nav" aria-label="System" data-sidebar-panel="system" hidden>
             <button class="workspace-section-nav__link" type="button" aria-current="page">Overview</button>
@@ -165,19 +216,39 @@
           </div>
         </section>
 
-        <section class="view-panel preview-workspace" data-view-panel="knowledge" hidden>
-          <header><div><p class="route-state__eyebrow">Sample library</p><h1>Knowledge Base</h1><p>Manage searchable PDFs and their access from the same production workspace.</p></div><button class="button-primary" type="button" data-demo-action="Uploads are disabled in preview mode.">Upload PDF</button></header>
-          <div class="preview-grid">
-            <article><span>Ready documents</span><strong>6</strong><small>All searchable</small></article>
-            <article><span>Indexed pages</span><strong>184</strong><small>1,247 chunks</small></article>
-            <article><span>Storage</span><strong>38.4 MB</strong><small>Local device</small></article>
+        <section class="view-panel" data-view-panel="knowledge" hidden>
+          <div class="kb-workbench kb-workbench--details-hidden" style="--kb-details-width: 300px">
+            <section class="kb-editor-area" aria-label="Knowledge Base editor">
+              <div class="kb-editor-tabs" role="tablist" aria-label="Open editors">
+                <button class="kb-editor-tab" type="button" role="tab" aria-selected="true" data-active="true">
+                  <span class="kb-editor-tab__select"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6.5h7l2 2h9v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg><span data-kb-tab-title>Welcome</span><svg class="kb-editor-tab__pin" aria-hidden="true" viewBox="0 0 24 24"><path d="m9 3 6 6M8 8l8-3-1 8 3 3-6 2-6-6 2-4ZM5 19l4-4" /></svg></span>
+                </button>
+              </div>
+              <div class="kb-breadcrumb-bar">
+                <nav aria-label="Folder breadcrumb"><ol class="m-0 flex list-none flex-wrap items-center gap-x-2 p-0 text-sm leading-7"><li><button type="button" class="min-h-11 min-w-11 px-1 underline underline-offset-4" data-kb-folder="Root">Root</button></li><li class="flex items-center gap-2" data-kb-breadcrumb-child hidden><span aria-hidden="true">/</span><button type="button" aria-current="location" class="min-h-11 min-w-11 px-1 underline underline-offset-4" data-kb-breadcrumb-name></button></li></ol></nav>
+                <span class="tooltip"><button type="button" aria-label="Toggle ingestion activity" data-kb-activity-toggle><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3" /></svg></button></span>
+              </div>
+              <div class="kb-editor-content">
+                <section class="kb-welcome" aria-labelledby="kb-welcome-title" data-kb-welcome>
+                  <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5v-16ZM20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5v-16Z" /></svg>
+                  <h1 id="kb-welcome-title">Knowledge Base</h1>
+                  <p>Open a PDF or folder from the Explorer.</p>
+                  <button class="button-primary" type="button" data-demo-action="Uploads are disabled in preview mode."><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16" /></svg>Upload PDF</button>
+                </section>
+                <section class="kb-folder-editor" aria-labelledby="kb-folder-title" data-kb-folder-editor hidden>
+                  <div class="kb-folder-editor__heading"><span class="kb-folder-editor__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 6.5h7l2 2h9v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></span><div><p>Folder overview</p><h1 id="kb-folder-title" data-kb-folder-title>Root</h1><span data-kb-folder-path>/</span></div><button class="button-primary" type="button" data-demo-action="Uploads are disabled in preview mode."><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16" /></svg>Upload PDF</button></div>
+                  <dl class="kb-folder-stats"><div><dt>Folders</dt><dd data-kb-folder-count>2</dd></div><div><dt>PDFs</dt><dd data-kb-pdf-count>0</dd></div><div><dt>Ready</dt><dd data-kb-ready-count>0</dd></div></dl>
+                  <div class="kb-recent"><h2>Documents</h2><p data-kb-empty>This folder is empty. Upload a PDF to begin.</p><ul data-kb-documents hidden></ul></div>
+                </section>
+              </div>
+            </section>
+            <section class="kb-bottom-panel" aria-label="Knowledge Base activity panel" style="height: 220px" data-kb-activity-panel hidden>
+              <div class="kb-bottom-panel__resize" role="separator" aria-label="Resize activity panel"></div>
+              <header><div role="tablist" aria-label="Activity panel sections"><button type="button" role="tab" aria-selected="true">Ingestion</button><button type="button" role="tab" aria-selected="false">Errors</button></div><span class="tooltip"><button type="button" aria-label="Close activity panel" data-kb-activity-close><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></svg></button></span></header>
+              <div class="kb-bottom-panel__body"><p>No active ingestion jobs in this browser session.</p></div>
+            </section>
+            <footer class="kb-status-bar" aria-label="Knowledge Base status"><span class="tooltip"><span>4 ready</span></span><span class="tooltip"><button type="button" data-kb-activity-toggle>0 indexing</button></span><span class="tooltip"><span class="kb-status-bar__folder" data-kb-status-folder>Root</span></span><span class="kb-status-bar__spacer"></span><span class="tooltip"><span>Local only</span></span></footer>
           </div>
-          <section class="preview-table" aria-label="Sample documents">
-            <div class="preview-table__header"><strong>Name</strong><strong>Status</strong></div>
-            <button type="button"><span><b>PDF</b><span><strong>Remote Work Policy.pdf</strong><small>12 pages · 48 chunks</small></span></span><span class="ready-badge">Ready</span></button>
-            <button type="button"><span><b>PDF</b><span><strong>People Handbook.pdf</strong><small>64 pages · 382 chunks</small></span></span><span class="ready-badge">Ready</span></button>
-            <button type="button"><span><b>PDF</b><span><strong>Security Onboarding.pdf</strong><small>22 pages · 126 chunks</small></span></span><span class="ready-badge">Ready</span></button>
-          </section>
         </section>
 
         <section class="view-panel preview-workspace" data-view-panel="system" hidden>
@@ -212,6 +283,6 @@
     </dialog>
 
     <div class="toast" role="status" aria-live="polite" data-toast></div>
-    <script src="./app.js"></script>
+    <script src="./app.js?v=4"></script>
   </body>
 </html>

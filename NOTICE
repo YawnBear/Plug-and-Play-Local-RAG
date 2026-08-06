@@ -6,5 +6,5 @@ third-party components distributed under their own licenses.
 
 The Apache License 2.0 applies to Local RAG source code. It does not relicense
 third-party runtimes, libraries, container images, or machine-learning models.
-See THIRD_PARTY_NOTICES, MODEL_LICENSES, and SBOM.cdx.json for the
+See THIRD_PARTY_NOTICES.md, MODEL_LICENSES.md, and SBOM.cdx.json for the
 release inventory and upstream license locations.

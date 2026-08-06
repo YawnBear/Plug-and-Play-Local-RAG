@@ -37,6 +37,22 @@
     S4: { title: "Travel & Expenses.pdf", page: "Page 7", path: "/Company policies/Travel & Expenses.pdf", section: "Receipts and declarations", quote: "Itemized receipts are required for individual expenses above $25. Lodging receipts are always required." },
   };
 
+  const folders = {
+    Root: { row: "root", path: "/", folders: 2, documents: [] },
+    "Company policies": {
+      row: "policies",
+      path: "/Company policies",
+      folders: 0,
+      documents: ["Remote Work Policy.pdf", "People Handbook.pdf", "Travel & Expenses.pdf"],
+    },
+    Security: {
+      row: "security",
+      path: "/Security",
+      folders: 0,
+      documents: ["Security Onboarding.pdf"],
+    },
+  };
+
   const transcript = document.querySelector("[data-transcript]");
   const aboutDialog = document.querySelector("[data-about-dialog]");
   const sourceDrawer = document.querySelector("[data-source-drawer]");
@@ -83,6 +99,62 @@
     });
     document.querySelector("[data-sidebar-title]").textContent = title;
     document.querySelector("[data-mobile-title]").textContent = title;
+    document.querySelector("[data-new-chat]").hidden = view !== "chat";
+    document.querySelector(".primary-sidebar").setAttribute("aria-label", `${title} sidebar`);
+  }
+
+  function selectFolder(name) {
+    const folder = folders[name];
+    if (!folder) return;
+    document.querySelector(".kb-editor-tabs").innerHTML = `<button class="kb-editor-tab" type="button" role="tab" aria-selected="false" data-kb-welcome-tab><span class="kb-editor-tab__select"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6.5h7l2 2h9v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span>Welcome</span><svg class="kb-editor-tab__pin" aria-hidden="true" viewBox="0 0 24 24"><path d="m9 3 6 6M8 8l8-3-1 8 3 3-6 2-6-6 2-4ZM5 19l4-4"></path></svg></span><span aria-hidden="true" class="kb-editor-tab__close" data-kb-welcome-close><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"></path></svg></span></button><button class="kb-editor-tab" type="button" role="tab" aria-selected="true" data-active="true" data-preview="true"><span class="kb-editor-tab__select"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6.5h7l2 2h9v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span>${escapeHtml(name)}</span><span class="sr-only">Preview</span></span><span aria-hidden="true" class="kb-editor-tab__close" data-kb-close-folder><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"></path></svg></span></button>`;
+    document.querySelectorAll("[data-kb-row]").forEach((row) => {
+      row.setAttribute("aria-selected", row.dataset.kbRow === folder.row ? "true" : "false");
+    });
+    document.querySelector("[data-kb-welcome]").hidden = true;
+    document.querySelector("[data-kb-folder-editor]").hidden = false;
+    document.querySelector("[data-kb-folder-title]").textContent = name;
+    document.querySelector("[data-kb-folder-path]").textContent = folder.path;
+    document.querySelector("[data-kb-folder-count]").textContent = String(folder.folders);
+    document.querySelector("[data-kb-pdf-count]").textContent = String(folder.documents.length);
+    document.querySelector("[data-kb-ready-count]").textContent = String(folder.documents.length);
+    document.querySelector("[data-kb-status-folder]").textContent = name;
+    const breadcrumb = document.querySelector("[data-kb-breadcrumb-child]");
+    breadcrumb.hidden = name === "Root";
+    document.querySelector("[data-kb-breadcrumb-name]").textContent = name;
+    const list = document.querySelector("[data-kb-documents]");
+    const empty = document.querySelector("[data-kb-empty]");
+    list.hidden = folder.documents.length === 0;
+    empty.hidden = folder.documents.length !== 0;
+    list.innerHTML = folder.documents.map((documentName) => `<li><button type="button" data-kb-document="${escapeHtml(documentName)}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"></path><path d="M14 3v5h5M9 13h6M9 17h5"></path></svg><span><strong>${escapeHtml(documentName)}</strong><small>ready</small></span></button></li>`).join("");
+  }
+
+  function showWelcomeEditor() {
+    document.querySelector(".kb-editor-tabs").innerHTML = `<button class="kb-editor-tab" type="button" role="tab" aria-selected="true" data-active="true"><span class="kb-editor-tab__select"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6.5h7l2 2h9v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span data-kb-tab-title>Welcome</span><svg class="kb-editor-tab__pin" aria-hidden="true" viewBox="0 0 24 24"><path d="m9 3 6 6M8 8l8-3-1 8 3 3-6 2-6-6 2-4ZM5 19l4-4"></path></svg></span></button>`;
+    document.querySelector("[data-kb-welcome]").hidden = false;
+    document.querySelector("[data-kb-folder-editor]").hidden = true;
+    document.querySelector("[data-kb-breadcrumb-child]").hidden = true;
+    document.querySelector("[data-kb-status-folder]").textContent = "Root";
+  }
+
+  function toggleExplorerBranch(id, forceExpanded) {
+    const row = document.querySelector(`[data-kb-row="${id}"]`);
+    const children = document.querySelector(`[data-kb-children="${id}"]`);
+    if (!row || !children) return;
+    const expanded = forceExpanded === undefined ? row.getAttribute("aria-expanded") !== "true" : !forceExpanded;
+    const nextExpanded = !expanded;
+    row.setAttribute("aria-expanded", String(nextExpanded));
+    if (nextExpanded) row.setAttribute("data-expanded-children", "true");
+    else row.removeAttribute("data-expanded-children");
+    children.hidden = !nextExpanded;
+    const icon = row.querySelector(".kb-explorer__chevron svg");
+    if (icon) icon.classList.toggle("rotate-90", nextExpanded);
+    const button = row.querySelector("[data-kb-toggle]");
+    if (button) button.setAttribute("aria-label", `${nextExpanded ? "Collapse" : "Expand"} ${row.querySelector(".kb-explorer__label span").textContent}`);
+  }
+
+  function toggleActivityPanel() {
+    const panel = document.querySelector("[data-kb-activity-panel]");
+    panel.hidden = !panel.hidden;
   }
 
   function openSource(id) {
@@ -103,6 +175,20 @@
     if (conversation) { showView("chat"); renderConversation(conversation.dataset.conversation); }
     const source = event.target.closest("[data-source]");
     if (source) openSource(source.dataset.source);
+    const folder = event.target.closest("[data-kb-folder]");
+    if (folder) selectFolder(folder.dataset.kbFolder);
+    if (event.target.closest("[data-kb-welcome-tab], [data-kb-close-folder]")) showWelcomeEditor();
+    const documentButton = event.target.closest("[data-kb-document]");
+    if (documentButton) showToast(`${documentButton.dataset.kbDocument} is fictional; production opens the real PDF editor here.`);
+    const explorerToggle = event.target.closest("[data-kb-toggle]");
+    if (explorerToggle) toggleExplorerBranch(explorerToggle.dataset.kbToggle);
+    if (event.target.closest("[data-kb-collapse]")) {
+      toggleExplorerBranch("root", true);
+      toggleExplorerBranch("policies", false);
+      toggleExplorerBranch("security", false);
+    }
+    if (event.target.closest("[data-kb-activity-toggle]")) toggleActivityPanel();
+    if (event.target.closest("[data-kb-activity-close]")) document.querySelector("[data-kb-activity-panel]").hidden = true;
     const action = event.target.closest("[data-demo-action]");
     if (action) showToast(action.dataset.demoAction);
     if (event.target.closest("[data-new-chat]")) { showView("chat"); document.querySelector("[data-question-input]").focus(); showToast("Ask one of the sample topics: remote work, security, or expenses."); }
