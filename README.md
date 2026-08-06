@@ -321,11 +321,18 @@ These capabilities are roadmap items and are not part of the current release.
 Never submit real documents, filenames, prompts, answers, credentials, tokens,
 environment files, private keys, database dumps, or unrestricted logs in a
 public issue. Report suspected vulnerabilities privately through the
-repository's GitHub Security Advisory page; see `SECURITY`.
+repository's GitHub Security Advisory page; see [SECURITY.md](SECURITY.md).
 
 ## License
 
 Local RAG source code is licensed under the Apache License 2.0. Third-party
 components and machine-learning models retain their upstream licenses. See
-`LICENSE`, `NOTICE`, `THIRD_PARTY_NOTICES`, `MODEL_LICENSES`, and
-`SBOM.cdx.json`.
+[LICENSE](LICENSE), [NOTICE](NOTICE),
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md),
+[MODEL_LICENSES.md](MODEL_LICENSES.md), and [SBOM.cdx.json](SBOM.cdx.json).
+
+## Contributing
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and
+follow the [Code of Conduct](CODE_OF_CONDUCT.md) before opening an issue or
+pull request.

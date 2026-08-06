@@ -82,4 +82,10 @@ tmp/
 
 # Private project notes and local Codex capabilities are not published.
 *.md
+!/README.md
+!/CODE_OF_CONDUCT.md
+!/CONTRIBUTING.md
+!/MODEL_LICENSES.md
+!/SECURITY.md
+!/THIRD_PARTY_NOTICES.md
 **/skills/

@@ -54,7 +54,7 @@ if (Test-Path -LiteralPath $output) {
 else { [IO.Directory]::CreateDirectory($output) | Out-Null }
 
 $requiredPayload = @(
-    'LICENSE','NOTICE','THIRD_PARTY_NOTICES','MODEL_LICENSES',
+    'LICENSE','NOTICE','THIRD_PARTY_NOTICES.md','MODEL_LICENSES.md',
     'ops\windows\release-allowed-signers',
     'ops\windows\v8a\personal-release.json',
     'ops\windows\v8a\product-profiles.json',

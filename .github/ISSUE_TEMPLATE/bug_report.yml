@@ -5,7 +5,7 @@ labels: [bug]
 body:
   - type: markdown
     attributes:
-      value: Do not report vulnerabilities here. Follow the SECURITY file instead.
+      value: Do not report vulnerabilities here. Follow SECURITY.md instead.
   - type: input
     id: release
     attributes:

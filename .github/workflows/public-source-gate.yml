@@ -74,12 +74,12 @@ jobs:
         run: |
           test -z "${{ secrets.LOCAL_RAG_RELEASE_PRIVATE_KEY }}"
           test -f LICENSE
-          test -f README
-          test -f SECURITY
-          test -f CODE_OF_CONDUCT
-          test -f CONTRIBUTING
-          test -f THIRD_PARTY_NOTICES
-          test -f MODEL_LICENSES
+          test -f README.md
+          test -f SECURITY.md
+          test -f CODE_OF_CONDUCT.md
+          test -f CONTRIBUTING.md
+          test -f THIRD_PARTY_NOTICES.md
+          test -f MODEL_LICENSES.md
           test -f SBOM.cdx.json
       - name: Explain publish boundary
         run: |
