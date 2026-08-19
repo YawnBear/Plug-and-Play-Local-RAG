@@ -112,9 +112,39 @@ export function parseEnv(text) {
   return result;
 }
 
+function startupError(code, message) {
+  const error = new Error(message);
+  error.code = code;
+  return error;
+}
+
+export function startupFailureMessage(error) {
+  switch (error?.code) {
+    case "LOCAL_RAG_MISSING_ENV_FILE":
+      return "a required environment file is missing; copy its .env.example file and configure it";
+    case "LOCAL_RAG_MISSING_ENV_VALUE":
+      return "a required environment value is missing; complete the project .env files";
+    case "LOCAL_RAG_PLACEHOLDER_ENV_VALUE":
+      return "an environment value still contains an example placeholder; update the project .env files";
+    case "LOCAL_RAG_PORTS_OCCUPIED":
+      return "development listeners are already in use; stop the existing Local RAG instance before running pnpm dev";
+    case "LOCAL_RAG_MANAGED_PRODUCTION_RUNNING":
+      return "the managed RagSupervisor service is running; stop it before starting the development stack";
+    case "LOCAL_RAG_UNKNOWN_OPTION":
+      return "an unsupported command-line option was supplied; use pnpm dev or pnpm dev -- --check";
+    default:
+      return "startup failed. Review the component-prefixed diagnostics above";
+  }
+}
+
+export function reportStartupFailure(error, write = console.error) {
+  write(`[dev] ERROR: ${startupFailureMessage(error)}`);
+}
+
 export function readEnvFile(filePath) {
   if (!existsSync(filePath)) {
-    throw new Error(
+    throw startupError(
+      "LOCAL_RAG_MISSING_ENV_FILE",
       `missing ${path.relative(repositoryRoot, filePath)}; copy its .env.example first`,
     );
   }
@@ -124,10 +154,13 @@ export function readEnvFile(filePath) {
 function requireValue(environment, name) {
   const value = environment[name]?.trim();
   if (!value) {
-    throw new Error(`${name} must be configured`);
+    throw startupError("LOCAL_RAG_MISSING_ENV_VALUE", `${name} must be configured`);
   }
   if (/replace-with|replace_with|change-me/i.test(value)) {
-    throw new Error(`${name} still contains an example placeholder`);
+    throw startupError(
+      "LOCAL_RAG_PLACEHOLDER_ENV_VALUE",
+      `${name} still contains an example placeholder`,
+    );
   }
   return value;
 }
@@ -445,7 +478,8 @@ export async function assertDevelopmentPortsAvailable(
     const occupied = conflicts
       .map(({ name, host, port }) => `${name} (${host}:${port})`)
       .join(", ");
-    throw new Error(
+    throw startupError(
+      "LOCAL_RAG_PORTS_OCCUPIED",
       `development listeners are already in use: ${occupied}. ` +
         "Production and development processes cannot share these fixed listeners. " +
         "Stop the existing Local RAG instance (including RagSupervisor when production is running) before running pnpm dev.",
@@ -503,7 +537,8 @@ export async function assertManagedProductionStopped({
   }
   const state = match[1].toUpperCase();
   if (state !== "STOPPED") {
-    throw new Error(
+    throw startupError(
+      "LOCAL_RAG_MANAGED_PRODUCTION_RUNNING",
       `managed production service RagSupervisor is ${state}. ` +
         "Development must run separately from the managed production graph. " +
         "From an elevated PowerShell, run Stop-Service -Name RagSupervisor and verify it is stopped before running pnpm dev; the development launcher will not stop production automatically.",
@@ -661,7 +696,7 @@ function rerankerPrepared(modelPath) {
 
 async function ensureReranker(configuration) {
   if (rerankerPrepared(configuration.rerankerPath)) {
-    console.log(`[dev] Reranker ready at ${configuration.rerankerPath}`);
+    console.log("[dev] Reranker ready.");
     return;
   }
   const resultFile = path.join(configuration.runtimeRoot, "reranker-path.txt");
@@ -972,7 +1007,7 @@ async function stopCompose(configuration) {
       env: configuration.root,
       allowAfterStop: true,
     },
-  ).catch((error) => console.error(`[dev] ${error.message}`));
+  ).catch(() => console.error("[dev] Docker shutdown did not complete cleanly."));
 }
 
 export async function main(args = process.argv.slice(2)) {
@@ -1001,7 +1036,7 @@ export async function main(args = process.argv.slice(2)) {
     return;
   }
   if (args.length > 0) {
-    throw new Error(`unknown option: ${args[0]}`);
+    throw startupError("LOCAL_RAG_UNKNOWN_OPTION", `unknown option: ${args[0]}`);
   }
   await assertDevelopmentPortsAvailable();
 
@@ -1064,7 +1099,7 @@ const invokedDirectly =
   pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url;
 if (invokedDirectly) {
   main().catch((error) => {
-    console.error(`[dev] ERROR: ${error.message}`);
+    reportStartupFailure(error);
     process.exitCode = 1;
   });
 }

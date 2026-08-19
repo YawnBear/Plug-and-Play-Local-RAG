@@ -10,7 +10,9 @@ import {
   buildServiceEnvironments,
   developmentListenerSpecs,
   parseEnv,
+  reportStartupFailure,
   serviceSpecs,
+  startupFailureMessage,
 } from "./dev-system.mjs";
 
 test("parseEnv supports comments, export, quotes, and Windows paths", () => {
@@ -35,6 +37,23 @@ HASH="value # retained"
 
 test("parseEnv rejects malformed names", () => {
   assert.throws(() => parseEnv("NOT-VALID=value"), /invalid environment/);
+});
+
+test("startup failures preserve safe guidance without logging tainted details", () => {
+  const missing = Object.assign(new Error("C:\\private\\secret.env"), {
+    code: "LOCAL_RAG_MISSING_ENV_FILE",
+  });
+  assert.match(startupFailureMessage(missing), /environment file is missing/);
+
+  const occupied = Object.assign(new Error("attacker\r\ninjected"), {
+    code: "LOCAL_RAG_PORTS_OCCUPIED",
+  });
+  const output = [];
+  reportStartupFailure(occupied, (line) => output.push(line));
+  assert.deepEqual(output, [
+    "[dev] ERROR: development listeners are already in use; stop the existing Local RAG instance before running pnpm dev",
+  ]);
+  assert.doesNotMatch(output[0], /attacker|injected|[\r\n]/);
 });
 
 test("development listener preflight reports occupied ports and accepts released ports", async () => {

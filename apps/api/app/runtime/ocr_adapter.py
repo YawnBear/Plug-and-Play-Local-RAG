@@ -1,5 +1,6 @@
 import asyncio
 import json
+import re
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Protocol
@@ -39,6 +40,24 @@ class IsolatedOcrAdapter:
         mode: OcrMode,
         cancellation: asyncio.Event,
     ) -> Sequence[int]:
+        page_names: dict[int, str] = {}
+        for page_number in pages:
+            rendered = (
+                f"{page_number:06d}"
+                if isinstance(page_number, int) and not isinstance(page_number, bool)
+                else ""
+            )
+            if (
+                not rendered
+                or page_number < 1
+                or re.fullmatch(r"[0-9]{6}", rendered) is None
+            ):
+                raise ValueError("invalid OCR page set")
+            if page_number in page_names:
+                raise ValueError("invalid OCR page set")
+            page_names[page_number] = rendered
+        if not page_names:
+            raise ValueError("invalid OCR page set")
         root = Path(workspace)
         reader = PdfReader(root / "input.pdf")
         if len(reader.pages) != len(pages):
@@ -58,7 +77,7 @@ class IsolatedOcrAdapter:
                 writer = PdfWriter()
                 writer.add_page(source_page)
                 with (
-                    input_directory / f"page-{page_number:06d}.pdf"
+                    input_directory / f"page-{page_names[page_number]}.pdf"
                 ).open("xb") as output:
                     writer.write(output)
         if cancellation.is_set():
