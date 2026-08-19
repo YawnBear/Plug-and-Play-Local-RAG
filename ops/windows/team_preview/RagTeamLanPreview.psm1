@@ -8,6 +8,15 @@ $script:SignedStateNames = @(
     'installation-dependency-evidence.json'
 )
 
+function Resolve-RagTeamPreviewFileSystemPath {
+    param([Parameter(Mandatory)][string]$Path)
+    $resolved = Resolve-Path -LiteralPath $Path
+    if ($resolved.Provider.Name -cne 'FileSystem') {
+        throw 'Team/LAN preview paths must use the FileSystem provider.'
+    }
+    return [IO.Path]::GetFullPath($resolved.ProviderPath)
+}
+
 function Test-RagTeamPreviewDeniedFile {
     param(
         [Parameter(Mandatory)][IO.FileInfo]$File,
@@ -58,7 +67,8 @@ function Assert-RagTeamPreviewRfc1918Address {
 
 function Get-RagTeamPreviewFiles {
     param([Parameter(Mandatory)][string]$Root)
-    $resolved = (Resolve-Path -LiteralPath $Root).Path.TrimEnd('\')
+    $resolved = (Resolve-RagTeamPreviewFileSystemPath -Path $Root).TrimEnd('\')
+    $rootPrefix = $resolved + [IO.Path]::DirectorySeparatorChar
     $rootItem = Get-Item -LiteralPath $resolved -Force
     if (-not $rootItem.PSIsContainer -or
         ($rootItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
@@ -71,7 +81,11 @@ function Get-RagTeamPreviewFiles {
             throw "Team/LAN preview payload contains a reparse point: $($entry.FullName)"
         }
         if ($entry.PSIsContainer) { continue }
-        $relative = $entry.FullName.Substring($resolved.Length).TrimStart('\').Replace('\','/')
+        $fullPath = [IO.Path]::GetFullPath($entry.FullName)
+        if (-not $fullPath.StartsWith($rootPrefix,[StringComparison]::OrdinalIgnoreCase)) {
+            throw "Team/LAN preview file escapes its payload root: $fullPath"
+        }
+        $relative = $fullPath.Substring($rootPrefix.Length).Replace('\','/')
         if (Test-RagTeamPreviewDeniedFile -File $entry -RelativePath $relative) {
             throw "Team/LAN preview payload contains private material: $($entry.FullName)"
         }
@@ -83,7 +97,7 @@ function Get-RagTeamPreviewFiles {
         $names[$folded] = $true
         $files.Add([pscustomobject]@{
             path=$relative
-            sha256=(Get-FileHash -LiteralPath $entry.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            sha256=(Get-FileHash -LiteralPath $fullPath -Algorithm SHA256).Hash.ToLowerInvariant()
             size=[int64]$entry.Length
         })
     }
@@ -103,7 +117,7 @@ function Get-RagTeamPreviewTreeSha256 {
 
 function New-RagTeamPreviewInventory {
     param([Parameter(Mandatory)][string]$Root)
-    $resolved = (Resolve-Path -LiteralPath $Root).Path
+    $resolved = Resolve-RagTeamPreviewFileSystemPath -Path $Root
     $files = @(Get-RagTeamPreviewFiles -Root $resolved)
     if ($files.Count -eq 0) { throw 'Team/LAN preview inventory cannot be empty.' }
     [int64]$bytes = 0
@@ -128,7 +142,7 @@ function New-RagTeamPreviewInventory {
 
 function Test-RagTeamPreviewInventory {
     param([Parameter(Mandatory)][string]$Root)
-    $resolved = (Resolve-Path -LiteralPath $Root).Path
+    $resolved = Resolve-RagTeamPreviewFileSystemPath -Path $Root
     $path = Join-Path $resolved 'team-preview-inventory.json'
     $item = Get-Item -LiteralPath $path -Force -ErrorAction Stop
     if ($item.PSIsContainer -or ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -or
@@ -191,7 +205,9 @@ function Test-RagTeamPreviewInstalledRelease {
     if ([string]$payloadEvidence.tree_sha256 -cne $ExpectedTreeSha256) {
         throw 'Team/LAN preview payload changed after its initial verification.'
     }
-    $installed = (Resolve-Path -LiteralPath $InstalledReleaseRoot).Path.TrimEnd('\')
+    $installed = (Resolve-RagTeamPreviewFileSystemPath -Path $InstalledReleaseRoot).
+        TrimEnd('\')
+    $installedPrefix = $installed + [IO.Path]::DirectorySeparatorChar
     $installedItem = Get-Item -LiteralPath $installed -Force
     if (-not $installedItem.PSIsContainer -or
         ($installedItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
@@ -213,10 +229,17 @@ function Test-RagTeamPreviewInstalledRelease {
                     throw "Installed Team/LAN preview release contains a reparse point: $($_.FullName)"
                 }
                 if ($_.PSIsContainer) { return }
-                $relative = $_.FullName.Substring($installed.Length).TrimStart('\').Replace('\','/')
+                $fullPath = [IO.Path]::GetFullPath($_.FullName)
+                if (-not $fullPath.StartsWith(
+                    $installedPrefix,
+                    [StringComparison]::OrdinalIgnoreCase
+                )) {
+                    throw "Installed Team/LAN preview file escapes its release root: $fullPath"
+                }
+                $relative = $fullPath.Substring($installedPrefix.Length).Replace('\','/')
                 [pscustomobject]@{
                     path=$relative
-                    sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).
+                    sha256=(Get-FileHash -LiteralPath $fullPath -Algorithm SHA256).
                         Hash.ToLowerInvariant()
                     size=[int64]$_.Length
                 }

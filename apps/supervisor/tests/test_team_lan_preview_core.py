@@ -91,6 +91,33 @@ foreach($value in $rejected){
             self.assertNotEqual(denied.returncode, 0)
             self.assertIn("private material", denied.stderr)
 
+    def test_inventory_canonicalizes_filesystem_provider_paths(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "payload"
+            root.mkdir()
+            (root / "payload.txt").write_text("exact", encoding="utf-8")
+            script = r"""
+param($Module,$Parent,$Name)
+Import-Module $Module -Force
+$drive='RagTeamInventoryTest'
+New-PSDrive -Name $drive -PSProvider FileSystem -Root $Parent|Out-Null
+try {
+  $providerRoot=Join-Path ($drive+':') $Name
+  $inventory=New-RagTeamPreviewInventory -Root $providerRoot
+  if($inventory.files.Count -ne 1 -or $inventory.files[0].path -cne 'payload.txt'){
+    throw 'provider path was not canonicalized'
+  }
+  Test-RagTeamPreviewInventory -Root $providerRoot|Out-Null
+} finally { Remove-PSDrive -Name $drive }
+"""
+            result = run_powershell(
+                script,
+                str(MODULE),
+                str(root.parent),
+                root.name,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_only_packaged_service_environment_templates_are_allowed(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
