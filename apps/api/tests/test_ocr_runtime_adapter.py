@@ -72,6 +72,24 @@ class FailingFixtureAdapter:
             self.active -= 1
 
 
+@pytest.mark.parametrize("pages", [[], [0], [-1], [1_000_000], [True], [1, 1]])
+def test_invalid_page_sets_are_rejected_before_path_construction(
+    tmp_path: Path, pages: list[int]
+) -> None:
+    adapter = IsolatedOcrAdapter(ParallelFixtureAdapter())
+
+    with pytest.raises(ValueError, match="invalid OCR page set"):
+        asyncio.run(
+            adapter.process(
+                job_id="job-1",
+                workspace=str(tmp_path),
+                pages=pages,
+                mode=OcrMode.FULL_PAGE,
+                cancellation=asyncio.Event(),
+            )
+        )
+
+
 def test_process_count_splits_one_ocr_request_into_parallel_subprocess_batches(
     tmp_path: Path,
 ) -> None:

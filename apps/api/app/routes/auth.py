@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import re
 
 from fastapi import APIRouter, HTTPException, Request, Response, status
 
@@ -24,6 +25,7 @@ SESSION_COOKIE = "rag_session"
 PREAUTH_COOKIE = "rag_preauth"
 CSRF_COOKIE = "csrf_token"
 CSRF_HEADER = "X-CSRF-Token"
+COOKIE_TOKEN_PATTERN = re.compile(r"[A-Za-z0-9_-]{1,256}")
 SESSION_EXPIRED_DETAIL = {
     "code": "session_expired",
     "message": "Your session expired after 30 minutes of inactivity.",
@@ -34,12 +36,18 @@ AUTHENTICATION_REQUIRED_DETAIL = {
 }
 
 
+def _validated_cookie_token(token: str) -> str:
+    if COOKIE_TOKEN_PATTERN.fullmatch(token) is None:
+        raise RuntimeError("authentication service returned an invalid cookie token")
+    return token
+
+
 def _set_session_cookie(
     response: Response, token: str, *, maximum_age: int, secure: bool
 ) -> None:
     response.set_cookie(
         SESSION_COOKIE,
-        token,
+        _validated_cookie_token(token),
         max_age=maximum_age,
         secure=secure,
         httponly=True,
@@ -53,7 +61,7 @@ def _set_csrf_cookie(
 ) -> None:
     response.set_cookie(
         CSRF_COOKIE,
-        token,
+        _validated_cookie_token(token),
         max_age=maximum_age,
         secure=secure,
         httponly=False,

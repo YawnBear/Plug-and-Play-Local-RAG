@@ -44,7 +44,13 @@ def npm_components() -> list[dict[str, object]]:
     except IndexError as exc:
         raise ValueError("pnpm lock package section is unavailable") from exc
     components: list[dict[str, object]] = []
-    for raw in re.findall(r"^  '([^']+)':\s*$", package_section, re.MULTILINE):
+    package_keys = re.findall(
+        r'''^  (?:'([^']+)'|"([^"]+)"|([^'"\s][^:]*)):\s*$''',
+        package_section,
+        re.MULTILINE,
+    )
+    for single_quoted, double_quoted, unquoted in package_keys:
+        raw = single_quoted or double_quoted or unquoted
         if "@" not in raw:
             continue
         name, version = raw.rsplit("@", 1)

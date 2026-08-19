@@ -12,9 +12,19 @@ from apps.supervisor.release import (
     load_release_pins,
 )
 from apps.supervisor.updates import UpdateArtifact, VerifiedUpdate
+from ops.release.generate_v8f_artifacts import npm_components
 
 
 class ReleaseEvidenceTests(unittest.TestCase):
+    def test_sbom_includes_scoped_and_unscoped_locked_npm_dependencies(self) -> None:
+        components = {
+            (component["name"], component["version"])
+            for component in npm_components()
+        }
+        self.assertIn(("nanoid", "3.3.18"), components)
+        self.assertIn(("next", "16.3.0"), components)
+        self.assertIn(("@next/env", "16.3.0"), components)
+
     def test_release_rls_set_matches_migration_policy_set(self) -> None:
         migration_path = (
             Path(__file__).parents[2]

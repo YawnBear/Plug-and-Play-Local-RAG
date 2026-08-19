@@ -1,10 +1,13 @@
 import uuid
 from types import SimpleNamespace
 
+import pytest
+from fastapi import Response
 from fastapi.testclient import TestClient
 
 from app.config import Settings
 from app.main import create_app
+from app.routes.auth import _set_session_cookie
 from app.schemas.auth import AuthUser
 from app.security.actor import ActorContext, ActorRole
 from app.services.authentication import (
@@ -28,6 +31,16 @@ ACTOR = ActorContext(
     authorization_version=1,
     session_id=uuid.uuid4(),
 )
+
+
+def test_session_cookie_rejects_header_control_characters() -> None:
+    with pytest.raises(RuntimeError, match="invalid cookie token"):
+        _set_session_cookie(
+            Response(),
+            "opaque-token\r\nSet-Cookie: injected=value",
+            maximum_age=1800,
+            secure=True,
+        )
 
 
 class _Authentication:
