@@ -8,8 +8,8 @@
     "schema_version": {"type": "integer", "const": 1},
     "profiles": {
       "type": "array",
-      "minItems": 3,
-      "maxItems": 3,
+      "minItems": 4,
+      "maxItems": 4,
       "uniqueItems": true,
       "items": {
         "type": "object",
@@ -31,11 +31,11 @@
           "administration"
         ],
         "properties": {
-          "id": {"type": "string", "enum": ["personal", "team_lan", "contributor"]},
+          "id": {"type": "string", "enum": ["personal", "team_lan", "team_lan_preview_unsigned", "contributor"]},
           "default": {"type": "boolean"},
           "audience": {"type": "string", "minLength": 1, "maxLength": 160},
-          "runtime": {"type": "string", "enum": ["packaged", "managed_windows", "source_tree"]},
-          "ingress_mode": {"type": "string", "enum": ["loopback", "private_lan_https", "development_loopback"]},
+          "runtime": {"type": "string", "enum": ["packaged", "managed_windows", "managed_windows_preview", "source_tree"]},
+          "ingress_mode": {"type": "string", "enum": ["loopback", "private_lan_https", "private_lan_https_ipv4", "development_loopback"]},
           "browser_origin": {"type": "string", "minLength": 1, "maxLength": 128},
           "authentication_required": {"type": "boolean"},
           "caddy_required": {"type": "boolean"},

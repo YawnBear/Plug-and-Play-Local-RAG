@@ -392,6 +392,7 @@ class RuntimeEvidenceTests(unittest.TestCase):
             str(self.identity_secret_file),
             ("RAG_LAN_IPV4", "RAG_LAN_IPV6"),
         )
+        supervisor = Supervisor((service,), RestartPolicy(1, 60, (1,)))
         for environment, error in (
             (
                 {
@@ -424,7 +425,7 @@ class RuntimeEvidenceTests(unittest.TestCase):
         ):
             with self.subTest(environment=environment):
                 with self.assertRaisesRegex(RuntimeError, error):
-                    Supervisor._listener_addresses(service, environment)
+                    supervisor._listener_addresses(service, environment)
 
     def test_secret_acl_rejects_create_files_and_append_data_rights(self) -> None:
         child = f"{os.environ['COMPUTERNAME']}\\RagWorkerSvc"

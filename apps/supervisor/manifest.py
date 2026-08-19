@@ -24,6 +24,10 @@ CADDY_VERSION = "2.11.3"
 CADDY_EXECUTABLE_SHA256 = (
     "67514bc0449ae9b1465cf3d59ab269cb451e8ed88d991e461b24d1337b67f536"
 )
+CADDY_ARCHIVE_SHA512 = (
+    "338f5557a1554677875b79dbc4b10d008781111ad29223811e64217936fa5d586"
+    "02ddd54724ef1cb1473b7ec07805cf5286d6aa1e810febde7e36daf497d791f"
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -69,6 +73,7 @@ class DeploymentManifest:
     deployment_state: str
     deployment_blockers: tuple[str, ...]
     prerequisite_checks: tuple[str, ...]
+    product_profile: str = "team_lan"
 
     @classmethod
     def load(cls, path: Path) -> DeploymentManifest:
@@ -82,22 +87,30 @@ class DeploymentManifest:
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> DeploymentManifest:
+        profile = value.get("product_profile", "team_lan")
+        allowed_keys = {
+            "schema_version",
+            "deployment_id",
+            "canonical_host",
+            "firewall_profile",
+            "services",
+            "restart_policy",
+            "backup",
+            "updates",
+            "caddy",
+            "deployment_readiness",
+        }
+        if "product_profile" in value:
+            allowed_keys.add("product_profile")
         _require_exact_keys(
             value,
-            {
-                "schema_version",
-                "deployment_id",
-                "canonical_host",
-                "firewall_profile",
-                "services",
-                "restart_policy",
-                "backup",
-                "updates",
-                "caddy",
-                "deployment_readiness",
-            },
+            allowed_keys,
             "deployment manifest",
         )
+        if profile not in {"team_lan", "team_lan_preview_unsigned"}:
+            raise ManifestError(
+                "product_profile must be team_lan or team_lan_preview_unsigned"
+            )
         if value["schema_version"] != 2:
             raise ManifestError("schema_version must be 2")
         if value["canonical_host"] != "rag.home.arpa":
@@ -111,7 +124,9 @@ class DeploymentManifest:
         services_value = value["services"]
         if not isinstance(services_value, list):
             raise ManifestError("services must be an array")
-        services = tuple(_parse_service(item) for item in services_value)
+        services = tuple(
+            _parse_service(item, product_profile=profile) for item in services_value
+        )
         names = [item.name for item in services]
         if len(names) != len(set(names)):
             raise ManifestError("service names must be unique")
@@ -184,12 +199,12 @@ class DeploymentManifest:
         )
         if (
             caddy_version != CADDY_VERSION
-            or caddy_archive_sha512
-            != "338f5557a1554677875b79dbc4b10d008781111ad29223811e64217936fa5d58602ddd54724ef1cb1473b7ec07805cf5286d6aa1e810febde7e36daf497d791f"
+            or caddy_archive_sha512 != CADDY_ARCHIVE_SHA512
             or caddy_sha != CADDY_EXECUTABLE_SHA256
         ):
             raise ManifestError(
-                f"Caddy must pin version {CADDY_VERSION} and its approved SHA-256 together"
+                f"Caddy must pin version {CADDY_VERSION} and its approved "
+                "SHA-256 together"
             )
         readiness = value["deployment_readiness"]
         if not isinstance(readiness, dict):
@@ -220,6 +235,12 @@ class DeploymentManifest:
             "rag_supervisor_service",
             "full_graph_network_evidence",
         }
+        if profile == "team_lan_preview_unsigned":
+            required_checks = (required_checks - {"signed_release_chain"}) | {
+                "unsigned_inventory",
+                "preview_profile_isolation",
+                "rfc1918_ipv4",
+            }
         if set(prerequisite_checks) != required_checks:
             raise ManifestError("deployment prerequisite checks are incomplete")
         if readiness["state"] == "installable" and blockers:
@@ -248,6 +269,7 @@ class DeploymentManifest:
             deployment_state=readiness["state"],
             deployment_blockers=blockers,
             prerequisite_checks=prerequisite_checks,
+            product_profile=profile,
         )
 
     def digest(self) -> str:
@@ -301,6 +323,8 @@ class DeploymentManifest:
                 "prerequisite_checks": list(self.prerequisite_checks),
             },
         }
+        if self.product_profile != "team_lan":
+            value["product_profile"] = self.product_profile
         encoded = json.dumps(
             value, ensure_ascii=True, separators=(",", ":"), sort_keys=True
         ).encode("utf-8")
@@ -314,7 +338,7 @@ class DeploymentManifest:
             )
 
 
-def _parse_service(value: Any) -> Service:
+def _parse_service(value: Any, *, product_profile: str = "team_lan") -> Service:
     if not isinstance(value, dict):
         raise ManifestError("each service must be an object")
     _require_exact_keys(
@@ -357,12 +381,22 @@ def _parse_service(value: Any) -> Service:
         if (
             executable_path.name.casefold() != "caddy.exe"
             or executable_path.parent != work_path
-            or "signed-stage" not in {part.casefold() for part in work_path.parts}
-            or not work_path.name.startswith("release-")
+            or (
+                product_profile == "team_lan"
+                and (
+                    "signed-stage" not in {part.casefold() for part in work_path.parts}
+                    or not work_path.name.startswith("release-")
+                )
+            )
+            or (
+                product_profile == "team_lan_preview_unsigned"
+                and work_path
+                != PureWindowsPath(r"C:\Program Files\LocalRAG\current")
+            )
             or arguments != ("run", "--config", str(work_path / "Caddyfile"))
         ):
             raise ManifestError(
-                "Caddy executable and config must be co-located in one signed "
+                "Caddy executable and config must be co-located in the profile's "
                 "immutable release stage"
             )
     dependencies = _string_array(value["dependencies"], f"{name}.dependencies")

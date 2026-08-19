@@ -15,6 +15,10 @@ $journalPath = Join-Path $root 'state\installation-journal.json'
 $journal = Read-RagPersonalJson -Path $journalPath
 Assert-RagPersonalJournal -Journal $journal
 $dataRoot = Assert-RagPersonalPathSafe -Path ([string]$journal.data_root)
+$releaseRoot = Assert-RagPersonalPathSafe -Path ([string]$journal.release_root)
+$installedRelease = Read-RagPersonalJson -Path (Join-Path $root `
+    'config\personal-release.json')
+$developmentSource = [string]$installedRelease.payload_state -ceq 'development_template'
 if ($dataRoot.StartsWith($root + '\', [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Preserved Personal data unexpectedly resides under the removable install root.'
 }
@@ -69,6 +73,7 @@ foreach ($path in $actualOwned) {
         throw 'Personal uninstall ledger contains a path outside the install root.'
     }
 }
+Assert-RagPersonalRuntimeStopped
 $description = if ($DataAction -ceq 'Delete') {
     'Uninstall Local RAG Personal and permanently delete its data'
 } elseif ($DataAction -ceq 'Export') {
@@ -78,6 +83,12 @@ $description = if ($DataAction -ceq 'Delete') {
 }
 if (-not $PSCmdlet.ShouldProcess($root, $description)) {
     return
+}
+
+if (Test-RagPersonalReinstallCapsuleRequired -DataAction $DataAction) {
+    New-RagPersonalReinstallCapsule -DataAction $DataAction `
+        -InstallRoot $root -DataRoot $dataRoot -ReleaseRoot $releaseRoot `
+        -DevelopmentSource:$developmentSource | Out-Null
 }
 
 $menuMarker = Join-Path $root 'state\start-menu.json'

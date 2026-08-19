@@ -13,6 +13,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
+Import-Module (Join-Path $PSScriptRoot 'RagPersonalPayload.psm1') -Force
 $payload = (Resolve-Path -LiteralPath $PayloadRoot).Path
 $output = [IO.Path]::GetFullPath($OutputRoot)
 $privateKey = (Resolve-Path -LiteralPath $PrivateKeyPath).Path
@@ -22,13 +23,22 @@ if (Test-Path -LiteralPath (Join-Path $payload '.git')) {
 $forbiddenPayload = @(Get-ChildItem -LiteralPath $payload -Recurse -Force -File |
     Where-Object {
         $_.Name -ceq '.env' -or $_.Name -like '*.key' -or
-        $_.Name -like '*.pem' -or $_.Name -like '*.pfx' -or
+        $_.Name -like '*.pfx' -or
         $_.Name -ceq 'installation-secrets.json' -or
         $_.Name -ceq 'installation-journal.json'
     } | Select-Object -First 1)
 if ($forbiddenPayload.Count -gt 0) {
     throw "The assembled payload contains forbidden private state: $($forbiddenPayload[0].Name)"
 }
+$assembledManifestPath = Join-Path $payload 'ops\windows\v8a\personal-release.json'
+if (-not (Test-Path -LiteralPath $assembledManifestPath -PathType Leaf)) {
+    throw 'The assembled Personal payload contract is missing.'
+}
+$assembledManifest = Get-Content -Raw -LiteralPath $assembledManifestPath | ConvertFrom-Json
+if ($assembledManifest.payload_state -cne 'assembled_unsigned') {
+    throw 'Personal signing requires an assembled_unsigned payload.'
+}
+$null = Test-RagPersonalPayloadInventory -Root $payload
 if ($privateKey.StartsWith($repositoryRoot + '\',[StringComparison]::OrdinalIgnoreCase)) {
     throw 'The offline release private key must not reside in the repository.'
 }
@@ -62,7 +72,8 @@ $requiredPayload = @(
     'ops\windows\v8a\Install-Local-RAG.cmd',
     'ops\windows\v8a\Verify-and-Install-Local-RAG.ps1',
     'ops\windows\v8a\Check-for-Updates.cmd',
-    'ops\windows\v8a\Uninstall-Local-RAG.cmd'
+    'ops\windows\v8a\Uninstall-Local-RAG.cmd',
+    'personal-payload-inventory.json'
 )
 foreach ($relative in $requiredPayload) {
     if (-not (Test-Path -LiteralPath (Join-Path $payload $relative) -PathType Leaf)) {
@@ -101,7 +112,7 @@ try {
             throw "The assembled Personal payload artifact is missing: $($artifact.artifact_id)"
         }
     }
-    & $ValidationPython (Join-Path $contractRoot 'validate_contracts.py')
+    & $ValidationPython -B (Join-Path $contractRoot 'validate_contracts.py')
     if ($LASTEXITCODE -ne 0) { throw 'Packaged Personal contracts failed validation.' }
 
     $issued = [DateTimeOffset]::UtcNow
@@ -122,11 +133,13 @@ try {
     $trustInside = Join-Path $staging 'release-trust-metadata.json'
     [IO.File]::WriteAllText($trustInside,(($trust | ConvertTo-Json -Depth 6 -Compress)+"`n"),
         [Text.UTF8Encoding]::new($false))
-    & $ValidationPython (Join-Path $repositoryRoot 'ops\windows\validate_json_schema.py') `
+    & $ValidationPython -B (Join-Path $repositoryRoot 'ops\windows\validate_json_schema.py') `
         (Join-Path $contractRoot 'release-trust-metadata.schema.json') $trustInside
     if ($LASTEXITCODE -ne 0) { throw 'Release trust metadata failed schema validation.' }
+    $null = New-RagPersonalPayloadInventory -Root $staging
+    Test-RagPersonalPayloadInventory -Root $staging | Out-Null
 
-    & $ValidationPython (Join-Path $repositoryRoot 'ops\release\generate_v8f_artifacts.py') --check
+    & $ValidationPython -B (Join-Path $repositoryRoot 'ops\release\generate_v8f_artifacts.py') --check
     if ($LASTEXITCODE -ne 0) { throw 'The checked-in release SBOM is stale.' }
     Copy-Item (Join-Path $repositoryRoot 'SBOM.cdx.json') (Join-Path $output 'SBOM.cdx.json')
     Copy-Item $trustInside (Join-Path $output 'release-trust-metadata.json')
@@ -154,7 +167,7 @@ try {
     [IO.File]::WriteAllText($manifestPath,(([ordered]@{
         schema_version=1;version=$Version;artifacts=$artifacts
     } | ConvertTo-Json -Depth 6 -Compress)+"`n"),[Text.UTF8Encoding]::new($false))
-    & $ValidationPython (Join-Path $repositoryRoot 'ops\windows\validate_json_schema.py') `
+    & $ValidationPython -B (Join-Path $repositoryRoot 'ops\windows\validate_json_schema.py') `
         (Join-Path $repositoryRoot 'ops\windows\update-manifest.schema.json') $manifestPath
     if ($LASTEXITCODE -ne 0) { throw 'Personal update manifest failed schema validation.' }
     $ssh = Join-Path ([Environment]::SystemDirectory) 'OpenSSH\ssh-keygen.exe'

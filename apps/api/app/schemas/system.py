@@ -34,7 +34,9 @@ class SystemDisk(SystemModel):
 
 
 class SystemOverviewResponse(SystemModel):
-    product_profile: Literal["personal", "team_lan", "contributor"]
+    product_profile: Literal[
+        "personal", "team_lan", "team_lan_preview_unsigned", "contributor"
+    ]
     overall_state: Literal["ready", "attention", "unavailable"]
     recommended_action: str
     services: list[SystemServiceStatus]

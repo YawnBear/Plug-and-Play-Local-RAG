@@ -6,8 +6,8 @@ PostgreSQL/pgvector, RustFS, Ollama, BAAI BGE reranking, and an isolated
 PaddleOCR-VL service. Documents, prompts, retrieved passages, and answers stay
 on the operator's PC or private LAN deployment.
 
-This repository is the public source distribution. The optional signed Personal
-installer bundle is separate and is not included in the source release.
+This repository is the public source distribution. Maintainers may also publish
+an optional unsigned Personal preview ZIP or a signed Personal release bundle.
 
 **[Open the interactive frontend preview](https://yawnbear.github.io/Plug-and-Play-Local-RAG/)**
 
@@ -17,12 +17,79 @@ layout, and light/dark themes without connecting to a backend or uploading data.
 
 ## 1. Normal users
 
+### Unsigned Personal preview
+
+When a release provides `Local-RAG-Personal-Preview.zip`, the shortest setup is:
+
+1. Install and start Docker Desktop and Ollama.
+2. Download and extract `Local-RAG-Personal-Preview.zip`.
+3. Double-click the extracted root `Install-Local-RAG.cmd`.
+4. Keep the setup window open, enter the displayed one-time setup code, and
+   create the first owner account.
+
+The preview contains its own Python, OCR, Node.js, application, and model files,
+so users do not install Python, Node.js, or `uv`. It is intentionally unsigned;
+Windows may display a warning, and automatic updates are disabled. Install a
+newer preview manually when one is published.
+
+### Unsigned Team/LAN preview
+
+Maintainers may also publish `Local-RAG-Team-LAN-Preview.zip` for a small
+trusted LAN. On the attended Windows 10/11 host, install and start Docker
+Desktop and Ollama, extract the ZIP, and run `Install-Local-RAG-LAN.cmd` as an
+administrator. The installer accepts exactly one reserved RFC1918 IPv4 address
+and exposes only `https://rag.home.arpa:443`; all application services remain
+on loopback and the API uses mTLS behind Caddy.
+
+The attended LAN workflow is:
+
+1. Reserve the host's current private IPv4 address in the router or DHCP
+   server, then enter that address in the host installer.
+2. Copy the displayed owner setup code into the page the installer opens and
+   create the first owner account.
+3. Retrieve
+   `C:\ProgramData\LocalRAG\connectors\generation-1\Local-RAG-LAN-Connector.zip`
+   from the host, distribute that ZIP to each trusted client, and communicate
+   its displayed CA SHA-256 fingerprint over a separate trusted channel.
+4. On each client, run `Connect-to-Local-RAG.cmd` once, approve UAC, enter
+   the independently received fingerprint, and let the connector verify HTTPS
+   before it opens the application. The connector contains no private key or
+   account credential.
+5. To remove a client, run `Disconnect-from-Local-RAG.cmd` from the same
+   connector. It removes only the exact managed certificate and hosts state.
+6. Create users, teams, and folder permissions from the application's owner
+   administration UI.
+
+This preview is explicitly `unverified_unsigned`; Windows may warn about it,
+and automatic updates are unavailable. `Update-Local-RAG-LAN.cmd` is an
+attended manual release transaction with bounded Alembic migrations. It requires an
+administrator-selected backup folder outside the Local RAG program and data
+roots, and it will proceed only after an isolated restore verifies the database
+and exact object inventory. Keep the retained verified backup after updating.
+`Repair-Local-RAG-LAN.cmd` transactionally changes the host IPv4, Caddy
+and API environments, firewall rule, hosts ledger, and connector bundle. After
+repair, distribute the newly numbered connector generation; running its
+`Connect-to-Local-RAG.cmd` atomically replaces the older managed client state.
+The
+preview and signed Team installation states are mutually exclusive. Router
+port forwarding, public addresses, Public network profiles, and public-Internet
+deployment are not supported.
+
+To remove the host application, run `Uninstall-Local-RAG-LAN.cmd` from the
+extracted preview as administrator. It removes the supervisor, firewall and
+hosts configuration, trusted host CA, service identities, application files,
+and recreatable runtime state. PostgreSQL data, RustFS objects, protected store
+credentials, the provisioning journal, and external verified backups are
+preserved so uninstall cannot silently destroy the team's documents.
+
+### Source-based installation
+
 The easiest source-based installation is the included Windows setup launcher.
 It installs the locked application dependencies, creates isolated local data
 stores and secrets, downloads the approved models, builds the web application,
 and opens the first-owner registration page.
 
-### Requirements and downloads
+#### Requirements and downloads
 
 Use 64-bit Windows 10 or 11. Install the following tools before running setup:
 
@@ -31,8 +98,7 @@ Use 64-bit Windows 10 or 11. Install the following tools before running setup:
 | Docker Desktop | Runs PostgreSQL and RustFS | [Install Docker Desktop on Windows](https://docs.docker.com/desktop/setup/install/windows-install/) |
 | Ollama | Runs the local generation and embedding models | [Download Ollama for Windows](https://ollama.com/download/windows) |
 | Node.js | Builds and runs the web application; version 20+ is accepted and Node.js 24 LTS is recommended | [Download Node.js](https://nodejs.org/en/download) |
-| uv | Installs the locked Python environments | [Install uv](https://docs.astral.sh/uv/getting-started/installation/) |
-| Python | Needed for manual development; use Python 3.12+ | [Python releases for Windows](https://www.python.org/downloads/windows/) |
+| uv | Provisions the required Python runtime and installs the locked Python environments | [Install uv](https://docs.astral.sh/uv/getting-started/installation/) |
 
 The official uv installer can also be run from PowerShell:
 
@@ -44,7 +110,11 @@ After installing the prerequisites, restart the terminal so `node`, `corepack`,
 `ollama`, and `uv` are available on `PATH`. Start Docker Desktop and Ollama
 before continuing.
 
-### Install Local RAG
+You do not need to install Python separately for the normal setup flow; `uv`
+provisions the required runtime. Developers who run Python commands manually
+should use Python 3.12 or newer.
+
+#### Install Local RAG from source
 
 1. Download and extract the [latest source release](https://github.com/YawnBear/Plug-and-Play-Local-RAG/releases/latest), or clone the repository.
 2. Start Docker Desktop and Ollama.

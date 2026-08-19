@@ -145,6 +145,29 @@ def test_personal_profile_freezes_loopback_origin_and_http_cookie_contract() -> 
         )
 
 
+def test_team_lan_preview_requires_exact_rfc1918_address_and_enables_setup() -> None:
+    settings = Settings(
+        product_profile="team_lan_preview_unsigned",
+        rag_lan_ipv4="192.168.40.10",
+        cors_origins=[],
+    )
+
+    assert settings.setup_enabled is True
+    assert settings.cookie_secure is True
+    assert str(settings.rag_lan_ipv4) == "192.168.40.10"
+
+    with pytest.raises(ValidationError, match="RAG_LAN_IPV4"):
+        Settings(product_profile="team_lan_preview_unsigned", cors_origins=[])
+    with pytest.raises(ValidationError, match="RFC1918"):
+        Settings(
+            product_profile="team_lan_preview_unsigned",
+            rag_lan_ipv4="8.8.8.8",
+            cors_origins=[],
+        )
+    with pytest.raises(ValidationError, match="only valid"):
+        Settings(product_profile="team_lan", rag_lan_ipv4="192.168.40.10")
+
+
 def test_prepare_host_paths_only_creates_configured_directories(
     tmp_path: Path,
 ) -> None:

@@ -58,6 +58,12 @@ def _settings(profile: str = "personal") -> Settings:
             canonical_host="127.0.0.1",
             cors_origins=[],
         )
+    elif profile == "team_lan_preview_unsigned":
+        values.update(
+            product_profile="team_lan_preview_unsigned",
+            rag_lan_ipv4="192.168.40.10",
+            cors_origins=[],
+        )
     return Settings(**values)
 
 
@@ -67,9 +73,14 @@ def _client(
     setup = _Setup()
     container = SimpleNamespace(setup=setup)
     app = create_app(_settings(profile), container=container)
+    base_url = (
+        "http://127.0.0.1:8000"
+        if profile == "personal"
+        else "https://rag.home.arpa"
+    )
     client = TestClient(
         app,
-        base_url="http://127.0.0.1:8000",
+        base_url=base_url,
         client=(address, 50000),
     )
     return client, setup
@@ -225,3 +236,17 @@ def test_setup_is_hidden_from_remote_and_team_clients() -> None:
 
     team, _setup = _client(profile="team_lan")
     assert team.get("/api/setup/status").status_code == 404
+
+
+def test_preview_setup_is_visible_only_from_the_configured_host_address() -> None:
+    host, _setup = _client(
+        profile="team_lan_preview_unsigned", address="192.168.40.10"
+    )
+    response = host.get("/api/setup/status")
+    assert response.status_code == 200
+    assert "Secure" in response.headers["set-cookie"]
+
+    other_client, _setup = _client(
+        profile="team_lan_preview_unsigned", address="192.168.40.11"
+    )
+    assert other_client.get("/api/setup/status").status_code == 404
