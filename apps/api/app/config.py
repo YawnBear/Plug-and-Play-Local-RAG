@@ -1,5 +1,6 @@
 import re
 from functools import lru_cache
+from ipaddress import IPv4Address, ip_network
 from pathlib import Path
 from typing import Literal
 
@@ -12,7 +13,10 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=None, extra="ignore")
 
-    product_profile: Literal["personal", "team_lan", "contributor"] = "team_lan"
+    product_profile: Literal[
+        "personal", "team_lan", "team_lan_preview_unsigned", "contributor"
+    ] = "team_lan"
+    rag_lan_ipv4: IPv4Address | None = None
     deployment_id: str = ""
     environment: str = "development"
     canonical_origin: str = "https://rag.home.arpa"
@@ -127,6 +131,22 @@ class Settings(BaseSettings):
                 raise ValueError("canonical_origin must be https://rag.home.arpa")
             if self.canonical_host != "rag.home.arpa":
                 raise ValueError("canonical_host must be rag.home.arpa")
+        if self.product_profile == "team_lan_preview_unsigned":
+            private_networks = (
+                ip_network("10.0.0.0/8"),
+                ip_network("172.16.0.0/12"),
+                ip_network("192.168.0.0/16"),
+            )
+            if self.rag_lan_ipv4 is None or not any(
+                self.rag_lan_ipv4 in network for network in private_networks
+            ):
+                raise ValueError(
+                    "Team/LAN preview requires an RFC1918 RAG_LAN_IPV4"
+                )
+        elif self.rag_lan_ipv4 is not None:
+            raise ValueError(
+                "RAG_LAN_IPV4 is only valid for the Team/LAN preview profile"
+            )
         if len(self.csrf_signing_secret.get_secret_value()) < 32:
             raise ValueError("csrf_signing_secret must contain at least 32 characters")
         if self.environment == "production":
@@ -223,7 +243,7 @@ class Settings(BaseSettings):
 
     @property
     def setup_enabled(self) -> bool:
-        return self.product_profile == "personal"
+        return self.product_profile in {"personal", "team_lan_preview_unsigned"}
 
     @property
     def ocr_work_path(self) -> Path:

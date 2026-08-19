@@ -34,6 +34,22 @@
       "administration": "full_system"
     },
     {
+      "id": "team_lan_preview_unsigned",
+      "default": false,
+      "audience": "Several trusted users evaluating an unsigned private-LAN preview",
+      "runtime": "managed_windows_preview",
+      "ingress_mode": "private_lan_https_ipv4",
+      "browser_origin": "https://rag.home.arpa",
+      "authentication_required": true,
+      "caddy_required": true,
+      "lan_dns_required": true,
+      "certificates_required": true,
+      "inbound_firewall_required": true,
+      "dedicated_windows_identities_required": true,
+      "stores": ["postgresql_pgvector", "rustfs"],
+      "administration": "full_system"
+    },
+    {
       "id": "contributor",
       "default": false,
       "audience": "Developers running and changing the source tree",

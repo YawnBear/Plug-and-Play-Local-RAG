@@ -26,17 +26,22 @@ SETUP_CHALLENGE_COOKIE = "rag_setup_challenge"
 CSRF_HEADER = "X-CSRF-Token"
 
 
-def _require_personal_loopback(request: Request) -> None:
-    if not request.app.state.settings.setup_enabled:
+def _require_setup_client(request: Request) -> None:
+    settings = request.app.state.settings
+    if not settings.setup_enabled:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "not found")
     try:
         address = ipaddress.ip_address(request.client.host if request.client else "")
     except ValueError as exc:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "not found") from exc
-    if not address.is_loopback:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "not found")
-
-
+    if settings.product_profile == "personal" and address.is_loopback:
+        return
+    if (
+        settings.product_profile == "team_lan_preview_unsigned"
+        and address == settings.rag_lan_ipv4
+    ):
+        return
+    raise HTTPException(status.HTTP_404_NOT_FOUND, "not found")
 def _require_origin(request: Request) -> None:
     allowed = request.app.state.settings.allowed_request_origins
     if request.headers.get("origin") not in allowed:
@@ -84,7 +89,7 @@ def _clear_setup_cookies(request: Request, response: Response) -> None:
 
 @router.get("/status", response_model=SetupStatusResponse)
 async def setup_status(request: Request, response: Response) -> SetupStatusResponse:
-    _require_personal_loopback(request)
+    _require_setup_client(request)
     try:
         current = await request.app.state.container.setup.status()
     except SetupError as exc:
@@ -116,7 +121,7 @@ async def setup_challenge(
     response: Response,
     payload: SetupChallengeRequest,
 ) -> SetupChallengeResponse:
-    _require_personal_loopback(request)
+    _require_setup_client(request)
     _require_origin(request)
     _require_preauth_csrf(request)
     try:
@@ -157,7 +162,7 @@ async def setup_owner(
     response: Response,
     payload: SetupOwnerRequest,
 ) -> SetupOwnerResponse:
-    _require_personal_loopback(request)
+    _require_setup_client(request)
     _require_origin(request)
     _require_preauth_csrf(request)
     challenge_token = request.cookies.get(SETUP_CHALLENGE_COOKIE)

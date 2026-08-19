@@ -4,6 +4,7 @@ param(
     [string]$DataRoot = (Join-Path $env:LOCALAPPDATA 'LocalRAGData'),
     [string]$ReleaseRoot,
     [switch]$DevelopmentSource,
+    [switch]$UnsignedPreview,
     [switch]$Plan
 )
 
@@ -134,6 +135,37 @@ function Copy-RagPersonalContractFile {
     Protect-RagPersonalPath -Path $Destination
 }
 
+function Get-RagPersonalUnsignedPreviewMetadata {
+    param([Parameter(Mandatory)][string]$Root)
+    $markerPath = Join-Path $Root '.verified-archive-sha256'
+    $markerItem = Get-Item -LiteralPath $markerPath -Force -ErrorAction Stop
+    if ($markerItem.PSIsContainer -or
+        ($markerItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -or
+        $markerItem.Length -lt 64 -or $markerItem.Length -gt 128) {
+        throw 'The unsigned preview release marker is invalid.'
+    }
+    $treeHash = [IO.File]::ReadAllText($markerPath).Trim()
+    if ($treeHash -cnotmatch '^[0-9a-f]{64}$' -or
+        [IO.Path]::GetFileName($Root) -cne $treeHash) {
+        throw 'The unsigned preview release identity is invalid.'
+    }
+    $metadataPath = Join-Path $Root 'release-trust-metadata.json'
+    $metadata = Read-RagPersonalJson -Path $metadataPath
+    $fields = @($metadata.PSObject.Properties.Name | Sort-Object)
+    if (($fields -join ',') -cne
+            'policy_id,release_id,release_sequence,schema_version,tree_sha256' -or
+        $metadata.schema_version -ne 1 -or
+        [string]$metadata.policy_id -cne 'local-rag-unsigned-preview' -or
+        [string]$metadata.release_id -cne
+            ('personal-preview-' + $treeHash.Substring(0,16)) -or
+        $metadata.release_sequence -isnot [int] -or
+        [int]$metadata.release_sequence -ne 0 -or
+        [string]$metadata.tree_sha256 -cne $treeHash) {
+        throw 'The unsigned preview metadata is invalid.'
+    }
+    return $metadata
+}
+
 function Install-RagPersonalStartMenu {
     param(
         [Parameter(Mandatory)][string]$Root,
@@ -219,101 +251,12 @@ function Write-RagPersonalBootstrapEnvironments {
         })
 }
 
-function Write-RagPersonalRuntimeEnvironments {
-    param(
-        [Parameter(Mandatory)][pscustomobject]$Secrets,
-        [Parameter(Mandatory)][string]$ConfigurationRoot,
-        [Parameter(Mandatory)][string]$PersonalDataRoot,
-        [Parameter(Mandatory)][string]$Root
-    )
-    $values = $Secrets.values
-    $deploymentId = 'rag-personal-' + $Secrets.installation_id.Substring(0, 12)
-    $dbBase = '127.0.0.1:5432/rag'
-    $ocrPython = if ($DevelopmentSource) {
-        Join-Path $Root '.venv-ocr\Scripts\python.exe'
-    } else { Join-Path $Root 'runtimes\ocr-python\python.exe' }
-    $common = [ordered]@{
-        ENVIRONMENT='production'
-        DEPLOYMENT_ID=$deploymentId
-        DATA_ROOT=(Join-Path $PersonalDataRoot 'application')
-        OLLAMA_BASE_URL='http://127.0.0.1:11434'
-        GENERATION_MODEL='qwen3:8b'
-        EMBEDDING_MODEL='qwen3-embedding:0.6b'
-        RERANKER_MODEL='BAAI/bge-reranker-v2-m3'
-        OCR_PYTHON_EXECUTABLE=$ocrPython
-        OCR_PIPELINE_VERSION='v1.6'
-        OCR_DEVICE='cpu'
-        OBJECT_STORAGE_ENDPOINT_URL='http://127.0.0.1:9000'
-        OBJECT_STORAGE_REGION='us-east-1'
-        OBJECT_STORAGE_BUCKET='rag-originals'
-        OBJECT_STORAGE_FORCE_PATH_STYLE='true'
-        OBJECT_STORAGE_USE_TLS='false'
-    }
-    $roles = [ordered]@{
-        api = [ordered]@{
-            PRODUCT_PROFILE='personal'
-            CANONICAL_ORIGIN='http://127.0.0.1:3000'
-            CANONICAL_HOST='127.0.0.1'
-            CORS_ORIGINS='[]'
-            DATABASE_URL="postgresql+psycopg://rag_api:$($values.postgres_api)@$dbBase"
-            CSRF_SIGNING_SECRET=$values.csrf_signing_secret
-            COORDINATOR_BASE_URL='http://127.0.0.1:8100'
-            COORDINATOR_SERVICE_TOKEN=$values.coordinator_service_token
-            CONTROLLER_BASE_URL='http://127.0.0.1:8102'
-            CONTROLLER_SERVICE_TOKEN=$values.controller_service_token
-            OCR_SERVICE_BASE_URL='http://127.0.0.1:8101'
-            OCR_SERVICE_TOKEN=$values.ocr_service_token
-            OBJECT_STORAGE_ACCESS_KEY_ID=$values.rustfs_api_access
-            OBJECT_STORAGE_SECRET_ACCESS_KEY=$values.rustfs_api_secret
-        }
-        ingestion = [ordered]@{
-            WORKER_DATABASE_URL="postgresql+psycopg://rag_worker:$($values.postgres_worker)@$dbBase"
-            COORDINATOR_BASE_URL='http://127.0.0.1:8100'
-            COORDINATOR_SERVICE_TOKEN=$values.coordinator_service_token
-            OCR_SERVICE_BASE_URL='http://127.0.0.1:8101'
-            OCR_SERVICE_TOKEN=$values.ocr_service_token
-            OBJECT_STORAGE_ACCESS_KEY_ID=$values.rustfs_ingestion_access
-            OBJECT_STORAGE_SECRET_ACCESS_KEY=$values.rustfs_ingestion_secret
-        }
-        deletion = [ordered]@{
-            WORKER_DATABASE_URL="postgresql+psycopg://rag_worker:$($values.postgres_worker)@$dbBase"
-            OBJECT_STORAGE_ACCESS_KEY_ID=$values.rustfs_deletion_access
-            OBJECT_STORAGE_SECRET_ACCESS_KEY=$values.rustfs_deletion_secret
-        }
-    }
-    foreach ($role in $roles.Keys) {
-        $document = [ordered]@{}
-        foreach ($entry in $common.GetEnumerator()) { $document[$entry.Key] = $entry.Value }
-        foreach ($entry in $roles[$role].GetEnumerator()) { $document[$entry.Key] = $entry.Value }
-        Write-RagPersonalEnvironmentFile -Path (Join-Path $ConfigurationRoot "$role.env") `
-            -Values $document
-    }
-    Write-RagPersonalEnvironmentFile -Path (Join-Path $ConfigurationRoot 'inference.env') `
-        -Values ([ordered]@{
-            ENVIRONMENT='production'; DEPLOYMENT_ID=$deploymentId;
-            OLLAMA_BASE_URL='http://127.0.0.1:11434'; GENERATION_MODEL='qwen3:8b';
-            EMBEDDING_MODEL='qwen3-embedding:0.6b';
-            RERANKER_MODEL='BAAI/bge-reranker-v2-m3';
-            COORDINATOR_SERVICE_TOKEN=$values.coordinator_service_token
-        })
-    Write-RagPersonalEnvironmentFile -Path (Join-Path $ConfigurationRoot 'ocr.env') `
-        -Values ([ordered]@{
-            ENVIRONMENT='production'; DEPLOYMENT_ID=$deploymentId;
-            OCR_PYTHON_EXECUTABLE=$ocrPython; OCR_PIPELINE_VERSION='v1.6';
-            OCR_DEVICE='cpu'; OCR_CPU_THREADS='10'; OCR_PAGE_BATCH_SIZE='8'; OCR_PROCESS_COUNT='1';
-            OCR_SERVICE_TOKEN=$values.ocr_service_token;
-            OCR_WORKSPACE_ROOT=(Join-Path $PersonalDataRoot 'ocr-work')
-        })
-    Write-RagPersonalEnvironmentFile -Path (Join-Path $ConfigurationRoot 'web.env') `
-        -Values ([ordered]@{
-            NODE_ENV='production'; HOSTNAME='127.0.0.1'; PORT='3000';
-            INTERNAL_API_URL='http://127.0.0.1:8000'
-        })
-}
-
 $resolvedInstallRoot = Assert-RagPersonalPathSafe -Path $InstallRoot -AllowMissing
 $resolvedDataRoot = Assert-RagPersonalPathSafe -Path $DataRoot -AllowMissing
 $resolvedReleaseRoot = Assert-RagPersonalPathSafe -Path $ReleaseRoot
+if ($DevelopmentSource -and $UnsignedPreview) {
+    throw 'DevelopmentSource and UnsignedPreview cannot be combined.'
+}
 if ($resolvedDataRoot.StartsWith($resolvedInstallRoot + '\', [StringComparison]::OrdinalIgnoreCase)) {
     throw 'The preserved Personal data root must not be inside the removable install root.'
 }
@@ -323,9 +266,17 @@ $releaseManifest = Read-RagPersonalJson -Path $releaseManifestPath
 if ($releaseManifest.profile_id -cne 'personal') {
     throw 'The selected release is not a Personal profile payload.'
 }
-if (-not $DevelopmentSource -and $releaseManifest.payload_state -cne 'packaged') {
+$expectedPayloadState = if ($DevelopmentSource) {
+    'development_template'
+} elseif ($UnsignedPreview) {
+    'assembled_unsigned'
+} else { 'packaged' }
+if ([string]$releaseManifest.payload_state -cne $expectedPayloadState) {
     throw 'Public Personal installation requires a V8F verified packaged payload.'
 }
+$previewMetadata = if ($UnsignedPreview) {
+    Get-RagPersonalUnsignedPreviewMetadata -Root $resolvedReleaseRoot
+} else { $null }
 
 $contractResult = Invoke-RagPersonalContractValidation -Root $resolvedReleaseRoot `
     -SourceMode:$DevelopmentSource
@@ -335,6 +286,9 @@ if ($Plan) {
         result='pass'
         mode='read_only_plan'
         profile='personal'
+        distribution=if ($UnsignedPreview) { 'unsigned_preview' } elseif (
+            $DevelopmentSource
+        ) { 'source' } else { 'signed_release' }
         install_root=$resolvedInstallRoot
         data_root=$resolvedDataRoot
         contract_sha256=$contractResult.contract_sha256
@@ -353,7 +307,18 @@ if (-not $PSCmdlet.ShouldProcess($resolvedInstallRoot, 'Prepare Local RAG Person
 $stateRoot = Join-Path $resolvedInstallRoot 'state'
 $journalPath = Join-Path $stateRoot 'installation-journal.json'
 $journal = $null
+$reinstallCapsule = $null
 try {
+    $capsulePath = if (Test-Path -LiteralPath $resolvedDataRoot -PathType Container) {
+        Join-Path $resolvedDataRoot '.localrag-personal-reinstall.dpapi'
+    } else { $null }
+    if ($null -ne $capsulePath -and (Test-Path -LiteralPath $capsulePath)) {
+        $reinstallCapsule = Read-RagPersonalReinstallCapsule `
+            -DataRoot $resolvedDataRoot -InstallRoot $resolvedInstallRoot `
+            -ReleaseRoot $resolvedReleaseRoot -DevelopmentSource:$DevelopmentSource
+        Restore-RagPersonalReinstallCapsule -Capsule $reinstallCapsule `
+            -InstallRoot $resolvedInstallRoot
+    }
     if (-not (Test-Path -LiteralPath $journalPath -PathType Leaf)) {
         if (Test-Path -LiteralPath $resolvedInstallRoot) {
             $existing = @(Get-ChildItem -LiteralPath $resolvedInstallRoot -Force)
@@ -434,9 +399,75 @@ try {
         Complete-RagPersonalStep -Journal $journal -Step 'secrets_created' -JournalPath $journalPath
     }
     $secrets = Read-RagPersonalJson -Path $secretPath
+    Assert-RagPersonalSecretDocument -Document $secrets `
+        -InstallationId ([string]$journal.installation_id)
+
+    if ($null -ne $reinstallCapsule) {
+        $dockerData = $resolvedDataRoot.Replace('\','/')
+        Write-RagPersonalEnvironmentFile -Path $composeEnvironment -Values ([ordered]@{
+            RAG_PERSONAL_INSTALLATION_ID=$journal.installation_id
+            RAG_PERSONAL_POSTGRES_DATA="$dockerData/postgres"
+            RAG_PERSONAL_RUSTFS_DATA="$dockerData/rustfs"
+            POSTGRES_CLUSTER_ADMIN_PASSWORD=$secrets.values.postgres_cluster_admin
+            RUSTFS_ROOT_ACCESS_KEY=$secrets.values.rustfs_root_access
+            RUSTFS_ROOT_SECRET_KEY=$secrets.values.rustfs_root_secret
+        })
+        Write-RagPersonalBootstrapEnvironments -Secrets $secrets `
+            -ConfigurationRoot $configRoot -PersonalDataRoot $resolvedDataRoot
+        Write-RagPersonalRuntimeEnvironments -Secrets $secrets `
+            -ConfigurationRoot $configRoot -PersonalDataRoot $resolvedDataRoot `
+            -InstallRoot $resolvedInstallRoot -ReleaseRoot $resolvedReleaseRoot `
+            -DevelopmentSource:$DevelopmentSource
+    }
 
     $composeFile = Join-Path $configRoot 'compose.personal.yaml'
     $docker = (Get-Command docker.exe -ErrorAction Stop).Source
+    if ($null -ne $reinstallCapsule) {
+        $before = @(& $docker ps -a --filter `
+            "label=com.docker.compose.project=$($journal.compose_project)" --format '{{.ID}}')
+        if ($LASTEXITCODE -ne 0) { throw 'Could not inspect Personal containers for recovery.' }
+        foreach ($container in $before) {
+            if ([string]::IsNullOrWhiteSpace($container)) { continue }
+            $labels = (& $docker inspect --format `
+                '{{ index .Config.Labels "com.localrag.installation-id" }}|{{ index .Config.Labels "com.docker.compose.project" }}' `
+                $container).Trim()
+            if ($LASTEXITCODE -ne 0 -or $labels -cne
+                "$($journal.installation_id)|$($journal.compose_project)") {
+                throw 'Unknown container prevents Personal reinstall recovery.'
+            }
+        }
+        & $docker compose -p $journal.compose_project --env-file $composeEnvironment `
+            -f $composeFile up -d --wait
+        if ($LASTEXITCODE -ne 0) { throw 'Personal stores did not recover successfully.' }
+        $services = @(& $docker compose -p $journal.compose_project `
+            --env-file $composeEnvironment -f $composeFile ps --services --status running |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Sort-Object)
+        if ($LASTEXITCODE -ne 0 -or ($services -join ',') -cne 'postgres,rustfs') {
+            throw 'Recovered Personal stores do not match the exact Compose service set.'
+        }
+        $containers = @(& $docker compose -p $journal.compose_project `
+            --env-file $composeEnvironment -f $composeFile ps -a -q |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+        if ($LASTEXITCODE -ne 0 -or $containers.Count -ne 2) {
+            throw 'Recovered Personal stores do not match the exact container set.'
+        }
+        foreach ($container in $containers) {
+            $labels = (& $docker inspect --format `
+                '{{ index .Config.Labels "com.localrag.installation-id" }}|{{ index .Config.Labels "com.docker.compose.project" }}' `
+                $container).Trim()
+            if ($LASTEXITCODE -ne 0 -or $labels -cne
+                "$($journal.installation_id)|$($journal.compose_project)") {
+                throw 'Recovered Personal container labels are invalid.'
+            }
+        }
+        foreach ($check in @(@('postgres','5432'),@('rustfs','9000'))) {
+            $binding = (& $docker compose -p $journal.compose_project `
+                --env-file $composeEnvironment -f $composeFile port $check[0] $check[1]).Trim()
+            if ($LASTEXITCODE -ne 0 -or $binding -cnotmatch '^127\.0\.0\.1:[0-9]+$') {
+                throw "Recovered Personal $($check[0]) is not ready on IPv4 loopback."
+            }
+        }
+    }
     if (-not (Test-RagPersonalStepComplete -Journal $journal -Step 'stores_started')) {
         Start-RagPersonalStep -Journal $journal -Step 'stores_started' -JournalPath $journalPath
         $existingContainers = @(& $docker ps -a --filter `
@@ -553,7 +584,8 @@ try {
             -JournalPath $journalPath
         Write-RagPersonalRuntimeEnvironments -Secrets $secrets `
             -ConfigurationRoot $configRoot -PersonalDataRoot $resolvedDataRoot `
-            -Root $resolvedReleaseRoot
+            -InstallRoot $resolvedInstallRoot -ReleaseRoot $resolvedReleaseRoot `
+            -DevelopmentSource:$DevelopmentSource
         $setupCode = & (Join-Path $PSScriptRoot 'Issue-RagPersonalSetupCode.ps1') `
             -InstallRoot $resolvedInstallRoot -ReleaseRoot $resolvedReleaseRoot `
             -DevelopmentSource:$DevelopmentSource -PassThru
@@ -568,17 +600,23 @@ try {
         if (-not $DevelopmentSource) {
             $trustMetadataPath = Join-Path $resolvedReleaseRoot `
                 'release-trust-metadata.json'
-            $trustMetadata = Read-RagPersonalJson -Path $trustMetadataPath
-            if (
-                $trustMetadata.schema_version -ne 1 -or
-                [string]$trustMetadata.policy_id -cne 'local-rag-v8-release-trust' -or
-                [string]$trustMetadata.root_id -cne 'rag-root-v8' -or
-                [string]$trustMetadata.release_id -cnotmatch `
-                    '^[a-z0-9][a-z0-9._-]{5,127}$' -or
-                $trustMetadata.release_sequence -isnot [int] -or
-                [int]$trustMetadata.release_sequence -lt 1
-            ) {
-                throw 'Packaged Personal release trust metadata is invalid.'
+            $trustMetadata = if ($UnsignedPreview) {
+                $previewMetadata
+            }
+            else {
+                $signedMetadata = Read-RagPersonalJson -Path $trustMetadataPath
+                if (
+                    $signedMetadata.schema_version -ne 1 -or
+                    [string]$signedMetadata.policy_id -cne 'local-rag-v8-release-trust' -or
+                    [string]$signedMetadata.root_id -cne 'rag-root-v8' -or
+                    [string]$signedMetadata.release_id -cnotmatch `
+                        '^[a-z0-9][a-z0-9._-]{5,127}$' -or
+                    $signedMetadata.release_sequence -isnot [int] -or
+                    [int]$signedMetadata.release_sequence -lt 1
+                ) {
+                    throw 'Packaged Personal release trust metadata is invalid.'
+                }
+                $signedMetadata
             }
             Write-RagPersonalUtf8File `
                 -Path (Join-Path $stateRoot 'release-state.json') -Protect `
@@ -600,6 +638,10 @@ try {
     if ($journal.state -cne 'setup_required') {
         throw 'Personal V8A preparation did not reach setup_required.'
     }
+    if ($null -ne $reinstallCapsule) {
+        Install-RagPersonalStartMenu -Root $resolvedInstallRoot `
+            -Release $resolvedReleaseRoot
+    }
     [pscustomobject]@{
         result='pass'
         profile='personal'
@@ -613,6 +655,11 @@ try {
         )
         application_launcher=(Join-Path $PSScriptRoot 'Start-Local-RAG.cmd')
         data_preserved=$true
+        reinstall_recovered=($null -ne $reinstallCapsule)
+        distribution=if ($UnsignedPreview) { 'unsigned_preview' } elseif (
+            $DevelopmentSource
+        ) { 'source' } else { 'signed_release' }
+        automatic_updates_available=(-not $UnsignedPreview -and -not $DevelopmentSource)
     } | ConvertTo-Json -Depth 4
 }
 catch {

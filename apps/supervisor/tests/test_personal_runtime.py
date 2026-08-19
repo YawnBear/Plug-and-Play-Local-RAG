@@ -18,7 +18,13 @@ from apps.supervisor.personal_backup import (
     PersonalBackupError,
     PersonalBackupService,
 )
-from apps.supervisor.personal_runtime import ChildSpec, PersonalPaths, PersonalRuntime
+from apps.supervisor.personal_runtime import (
+    ChildSpec,
+    PersonalPaths,
+    PersonalRuntime,
+    PersonalRuntimeError,
+    complete_reinstall_recovery,
+)
 
 
 class FakeProcess:
@@ -117,7 +123,13 @@ def _runtime(tmp_path: Path) -> tuple[PersonalRuntime, Api, list[FakeProcess]]:
     )
     resolver = SignedProfileResolver(
         profiles,
-        {"balanced": (("OCR_CPU_THREADS", "10"), ("OCR_PAGE_BATCH_SIZE", "8"), ("OCR_PROCESS_COUNT", "1"))},
+        {
+            "balanced": (
+                ("OCR_CPU_THREADS", "10"),
+                ("OCR_PAGE_BATCH_SIZE", "8"),
+                ("OCR_PROCESS_COUNT", "1"),
+            )
+        },
     )
     api = Api()
     processes: list[FakeProcess] = []
@@ -170,6 +182,103 @@ def test_personal_runtime_forced_failure_restarts_and_restores_prior_values(
         ControllerStage.ROLLED_BACK,
         "prior_revision_restored",
     )
+
+
+def test_reinstall_completion_runs_only_after_all_children_are_ready(
+    tmp_path: Path,
+) -> None:
+    runtime, _api, _processes = _runtime(tmp_path)
+    events: list[str] = []
+    runtime._specs = {
+        name: runtime._specs["ocr"]
+        for name in ("inference", "ocr", "api", "ingestion", "deletion", "web")
+    }
+    runtime._children.clear()
+    runtime._start = lambda name: events.append(f"ready:{name}")  # type: ignore[method-assign]
+    runtime._recovery_completion = lambda: events.append("completed")
+
+    runtime.start_all()
+
+    assert events == [
+        "ready:inference",
+        "ready:ocr",
+        "ready:api",
+        "ready:ingestion",
+        "ready:deletion",
+        "ready:web",
+        "completed",
+    ]
+
+
+def test_failed_full_start_does_not_complete_reinstall(tmp_path: Path) -> None:
+    runtime, _api, _processes = _runtime(tmp_path)
+    completed = False
+    runtime._specs = {
+        name: runtime._specs["ocr"]
+        for name in ("inference", "ocr", "api", "ingestion", "deletion", "web")
+    }
+    runtime._children.clear()
+
+    def start(name: str) -> None:
+        if name == "web":
+            raise PersonalRuntimeError("forced full-start failure")
+
+    def complete() -> None:
+        nonlocal completed
+        completed = True
+
+    runtime._start = start  # type: ignore[method-assign]
+    runtime._recovery_completion = complete
+
+    with pytest.raises(PersonalRuntimeError, match="forced full-start failure"):
+        runtime.start_all()
+
+    assert completed is False
+
+
+def test_reinstall_completion_uses_fixed_module_command(tmp_path: Path) -> None:
+    install = tmp_path / "install"
+    release = tmp_path / "release"
+    data = tmp_path / "data"
+    for path in (
+        install / "state",
+        release / "ops" / "windows" / "v8a",
+        data,
+    ):
+        path.mkdir(parents=True, exist_ok=True)
+    (install / "state" / "reinstall-recovery.json").write_text("{}", encoding="utf-8")
+    (data / ".localrag-personal-reinstall.dpapi").write_bytes(b"ciphertext")
+    (release / "ops" / "windows" / "v8a" / "RagPersonal.psm1").write_text(
+        "", encoding="utf-8"
+    )
+    paths = PersonalPaths(
+        install_root=install.resolve(),
+        release_root=release.resolve(),
+        config_root=(install / "config").resolve(),
+        data_root=data.resolve(),
+        api_python=Path("C:/python.exe"),
+        node=Path("C:/node.exe"),
+    )
+    calls: list[tuple[list[str], dict[str, str]]] = []
+
+    def runner(command: list[str], **kwargs: object) -> object:
+        calls.append((command, kwargs["env"]))  # type: ignore[arg-type]
+        return type("Result", (), {"returncode": 0})()
+
+    complete_reinstall_recovery(paths, runner=runner)  # type: ignore[arg-type]
+
+    assert len(calls) == 1
+    command, environment = calls[0]
+    assert command[:6] == [
+        "powershell.exe",
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+    ]
+    assert environment["RAG_REINSTALL_INSTALL_ROOT"] == str(paths.install_root)
+    assert "Complete-RagPersonalReinstallRecovery" in command[-1]
 
 
 def test_backup_destination_never_accepts_application_or_data_paths(

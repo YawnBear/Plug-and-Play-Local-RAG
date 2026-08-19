@@ -26,6 +26,48 @@ class ManifestPlanningTests(unittest.TestCase):
         self.assertEqual(first.backup_state, "not_configured")
         self.assertIsNone(first.backup_destination)
 
+    def test_unsigned_preview_has_one_ipv4_but_signed_team_stays_dual_stack(
+        self,
+    ) -> None:
+        preview = copy.deepcopy(self.value)
+        preview["product_profile"] = "team_lan_preview_unsigned"
+        preview["deployment_readiness"]["prerequisite_checks"].remove(
+            "signed_release_chain"
+        )
+        preview["deployment_readiness"]["prerequisite_checks"].extend(
+            ["unsigned_inventory", "preview_profile_isolation", "rfc1918_ipv4"]
+        )
+        caddy = next(item for item in preview["services"] if item["name"] == "caddy")
+        caddy["working_directory"] = r"C:\Program Files\LocalRAG\current"
+        caddy["executable"] = caddy["working_directory"] + r"\caddy.exe"
+        caddy["arguments"] = [
+            "run",
+            "--config",
+            caddy["working_directory"] + r"\Caddyfile",
+        ]
+        caddy["environment_keys"].remove("RAG_LAN_IPV6")
+        manifest = DeploymentManifest.from_dict(preview)
+        self.assertEqual(manifest.product_profile, "team_lan_preview_unsigned")
+        from apps.supervisor.runtime import RuntimeError as SupervisorRuntimeError
+        from apps.supervisor.runtime import Supervisor
+
+        supervisor = Supervisor(
+            manifest.services,
+            manifest.restart_policy,
+            product_profile=manifest.product_profile,
+        )
+        self.assertEqual(
+            supervisor._listener_addresses(
+                manifest.services[0], {"RAG_LAN_IPV4": "192.168.1.4"}
+            ),
+            ("192.168.1.4",),
+        )
+        signed = DeploymentManifest.from_dict(self.value)
+        with self.assertRaisesRegex(SupervisorRuntimeError, "IPv4 and IPv6"):
+            Supervisor(signed.services, signed.restart_policy)._listener_addresses(
+                signed.services[0], {"RAG_LAN_IPV4": "192.168.1.4"}
+            )
+
     def test_only_caddy_can_be_a_lan_listener(self) -> None:
         invalid = copy.deepcopy(self.value)
         service = next(item for item in invalid["services"] if item["name"] == "api")

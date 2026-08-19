@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "profile": "team_lan_preview_unsigned",
+  "canonical_host": "rag.home.arpa",
+  "canonical_origin": "https://rag.home.arpa",
+  "expected_alembic_revision": "0014_restart_without_backup",
+  "compose_project_prefix": "localrag-team-",
+  "host_prerequisites": ["windows_10_or_11_workstation", "elevated", "docker_desktop_running", "ollama_running"],
+  "forbidden_host_prerequisites": ["psql", "mc", "node", "python", "uv"],
+  "services": ["caddy", "web", "api", "ingestion", "deletion", "inference", "ocr"],
+  "preview_api_environment": {
+    "PRODUCT_PROFILE": "team_lan_preview_unsigned",
+    "RAG_LAN_IPV4": "selected_rfc1918_address"
+  },
+  "stores": {
+    "postgres": {"host": "127.0.0.1", "port": 5432, "data": "data\\postgres"},
+    "rustfs": {"host": "127.0.0.1", "port": 9000, "bucket": "rag-originals", "data": "data\\rustfs"}
+  },
+  "failure_policy": {
+    "pre_provision": "remove_installer_owned_fresh_state",
+    "post_provision": "preserve_store_data_secrets_and_journal"
+  }
+}

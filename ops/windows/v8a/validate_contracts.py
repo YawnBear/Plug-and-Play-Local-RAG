@@ -54,7 +54,12 @@ def _validate_schema(document: str, schema: str) -> dict[str, Any]:
 
 def _validate_product_profiles(value: dict[str, Any]) -> None:
     profiles = {item["id"]: item for item in value["profiles"]}
-    if set(profiles) != {"personal", "team_lan", "contributor"}:
+    if set(profiles) != {
+        "personal",
+        "team_lan",
+        "team_lan_preview_unsigned",
+        "contributor",
+    }:
         raise ContractError("product profile set must be exact")
     if sum(bool(item["default"]) for item in profiles.values()) != 1:
         raise ContractError("exactly one product profile must be default")
@@ -81,6 +86,14 @@ def _validate_product_profiles(value: dict[str, Any]) -> None:
         or not all(team[field] for field in expected_false)
     ):
         raise ContractError("Team/LAN hardening contract was weakened")
+    preview = profiles["team_lan_preview_unsigned"]
+    if (
+        preview["runtime"] != "managed_windows_preview"
+        or preview["ingress_mode"] != "private_lan_https_ipv4"
+        or preview["browser_origin"] != "https://rag.home.arpa"
+        or not all(preview[field] for field in expected_false)
+    ):
+        raise ContractError("unsigned Team/LAN preview hardening was weakened")
 
 
 def _validate_capabilities(value: dict[str, Any]) -> None:

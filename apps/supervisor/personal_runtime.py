@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Protocol
+from typing import Callable, Protocol
 
 from .controller import (
     ConfigurationController,
@@ -170,9 +170,7 @@ class ControllerApi:
             {"nonce": request.nonce, "stage": stage},
         )
 
-    def backup_exported(
-        self, request: ControllerRequest, backup: BackupExport
-    ) -> None:
+    def backup_exported(self, request: ControllerRequest, backup: BackupExport) -> None:
         self._post(
             f"/internal/controller/backups/{request.change_id}/exported",
             {
@@ -265,6 +263,7 @@ class PersonalRuntime:
         backup: PersonalBackupService | None = None,
         popen: object = subprocess.Popen,
         sleeper: object = time.sleep,
+        recovery_completion: Callable[[], None] | None = None,
     ) -> None:
         self.paths = paths
         self._specs = {spec.name: spec for spec in specs}
@@ -274,6 +273,7 @@ class PersonalRuntime:
         self._backup = backup
         self._popen = popen
         self._sleep = sleeper
+        self._recovery_completion = recovery_completion
         self._children: dict[str, ProcessHandle] = {}
         self._overrides = self._read_overrides()
         self._lock = threading.RLock()
@@ -282,6 +282,8 @@ class PersonalRuntime:
         for name in ("inference", "ocr", "api", "ingestion", "deletion", "web"):
             if name in self._specs:
                 self._start(name)
+        if self._recovery_completion is not None:
+            self._recovery_completion()
 
     def monitor(self) -> int:
         while True:
@@ -653,6 +655,55 @@ def _read_environment(path: Path) -> dict[str, str]:
     return result
 
 
+def complete_reinstall_recovery(
+    paths: PersonalPaths,
+    *,
+    runner: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run,
+) -> None:
+    capsule = paths.data_root / ".localrag-personal-reinstall.dpapi"
+    marker = paths.install_root / "state" / "reinstall-recovery.json"
+    if not capsule.exists() and not marker.exists():
+        return
+    module = paths.release_root / "ops" / "windows" / "v8a" / "RagPersonal.psm1"
+    if not module.is_file():
+        raise PersonalRuntimeError("Personal reinstall completion module is missing")
+    environment = os.environ.copy()
+    environment.update(
+        {
+            "RAG_REINSTALL_MODULE": str(module),
+            "RAG_REINSTALL_INSTALL_ROOT": str(paths.install_root),
+            "RAG_REINSTALL_DATA_ROOT": str(paths.data_root),
+            "RAG_REINSTALL_RELEASE_ROOT": str(paths.release_root),
+        }
+    )
+    command = (
+        "$module=[Environment]::GetEnvironmentVariable('RAG_REINSTALL_MODULE');"
+        "$install=[Environment]::GetEnvironmentVariable('RAG_REINSTALL_INSTALL_ROOT');"
+        "$data=[Environment]::GetEnvironmentVariable('RAG_REINSTALL_DATA_ROOT');"
+        "$release=[Environment]::GetEnvironmentVariable('RAG_REINSTALL_RELEASE_ROOT');"
+        "Import-Module -LiteralPath $module -Force;"
+        "Complete-RagPersonalReinstallRecovery -InstallRoot $install "
+        "-DataRoot $data -ReleaseRoot $release | Out-Null"
+    )
+    result = runner(
+        [
+            "powershell.exe",
+            "-NoProfile",
+            "-NonInteractive",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            command,
+        ],
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise PersonalRuntimeError("Personal reinstall completion validation failed")
+
+
 def _command_path(name: str) -> Path:
     import shutil
 
@@ -696,13 +747,17 @@ def _load_profiles(
             runtime_device = item.get("runtime_device")
             if accelerator == "cpu":
                 runtime_device = "cpu"
-            elif not isinstance(runtime_device, str) or re.fullmatch(
-                r"gpu:[0-9]+", runtime_device
-            ) is None:
+            elif (
+                not isinstance(runtime_device, str)
+                or re.fullmatch(r"gpu:[0-9]+", runtime_device) is None
+            ):
                 continue
-            service, environment = "ocr", (
-                ("OCR_DEVICE", runtime_device),
-                ("OCR_PIPELINE_VERSION", "v1.6"),
+            service, environment = (
+                "ocr",
+                (
+                    ("OCR_DEVICE", runtime_device),
+                    ("OCR_PIPELINE_VERSION", "v1.6"),
+                ),
             )
         else:
             continue
@@ -801,7 +856,13 @@ def main() -> None:
         api_python=paths.api_python,
     )
     runtime = PersonalRuntime(
-        paths, _specs(paths), api, resolver, profile_values, backup=backup
+        paths,
+        _specs(paths),
+        api,
+        resolver,
+        profile_values,
+        backup=backup,
+        recovery_completion=lambda: complete_reinstall_recovery(paths),
     )
     if arguments.readiness_once:
         try:

@@ -48,7 +48,12 @@ const serviceSchema = z.object({
 }).strict();
 
 export const overviewSchema = z.object({
-  product_profile: z.enum(["personal", "team_lan", "contributor"]),
+  product_profile: z.enum([
+    "personal",
+    "team_lan",
+    "team_lan_preview_unsigned",
+    "contributor",
+  ]),
   overall_state: z.enum(["ready", "attention", "unavailable"]),
   recommended_action: z.string(),
   services: z.array(serviceSchema),

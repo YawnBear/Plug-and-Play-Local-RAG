@@ -122,6 +122,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             startup_diagnostic_path=(
                 arguments.manifest.parent / "supervisor-startup-failure.json"
             ),
+            product_profile=manifest.product_profile,
         ).run(manifest.deployment_id)
     print(json.dumps(output, indent=2, sort_keys=True))
     return 0

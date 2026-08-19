@@ -10,6 +10,15 @@ if not errorlevel 1 (
   pause
   exit /b 0
 )
+findstr /c:"\"payload_state\": \"assembled_unsigned\"" "%~dp0personal-release.json" >nul 2>&1
+if not errorlevel 1 (
+  echo This Local RAG preview was installed without release signing.
+  echo.
+  echo Automatic updates are disabled for unsigned preview installations.
+  echo Download a newer preview installer manually when one is available.
+  pause
+  exit /b 0
+)
 powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0Update-RagPersonal.ps1" -Mode Guided
 if errorlevel 1 (
   echo.

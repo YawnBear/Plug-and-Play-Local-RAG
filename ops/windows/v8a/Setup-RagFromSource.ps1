@@ -94,6 +94,166 @@ function Install-RagSourceMc {
     }
 }
 
+function Test-RagSourceRerankerComplete {
+    param([Parameter(Mandatory)][string]$Path)
+    if (-not (Test-Path -LiteralPath $Path -PathType Container)) { return $false }
+    return (
+        (Test-Path -LiteralPath (Join-Path $Path 'config.json') -PathType Leaf) -and
+        (Test-Path -LiteralPath (Join-Path $Path 'tokenizer_config.json') -PathType Leaf) -and
+        (@(Get-ChildItem -LiteralPath $Path -Filter '*.safetensors' -File -ErrorAction SilentlyContinue).Count -gt 0)
+    )
+}
+
+function Get-RagSourceMissingOcrAssets {
+    param([Parameter(Mandatory)][string]$Path)
+    $required = @(
+        'official_models\PaddleOCR-VL-1.6\inference.yml',
+        'official_models\PP-DocLayoutV3\inference.yml',
+        'fonts\PingFang-SC-Regular.ttf'
+    )
+    return @($required | Where-Object {
+        -not (Test-Path -LiteralPath (Join-Path $Path $_) -PathType Leaf)
+    })
+}
+
+function Invoke-RagSourceCommandWithEnvironment {
+    param(
+        [Parameter(Mandatory)][string]$Program,
+        [Parameter(Mandatory)][string[]]$Arguments,
+        [Parameter(Mandatory)][string]$FailureMessage,
+        [Parameter(Mandatory)][hashtable]$Environment
+    )
+    $prior = @{}
+    foreach ($name in $Environment.Keys) {
+        $prior[$name] = [Environment]::GetEnvironmentVariable($name, 'Process')
+        [Environment]::SetEnvironmentVariable($name, [string]$Environment[$name], 'Process')
+    }
+    try {
+        Invoke-RagSourceCommand -Program $Program -Arguments $Arguments -FailureMessage $FailureMessage
+    }
+    finally {
+        foreach ($name in $Environment.Keys) {
+            if ($null -eq $prior[$name]) {
+                [Environment]::SetEnvironmentVariable($name, $null, 'Process')
+            }
+            else {
+                [Environment]::SetEnvironmentVariable($name, $prior[$name], 'Process')
+            }
+        }
+    }
+}
+
+function Prepare-RagSourceModelAssets {
+    param(
+        [Parameter(Mandatory)][string]$DataRootPath,
+        [Parameter(Mandatory)][string]$ApiRootPath,
+        [Parameter(Mandatory)][string]$SourceRootPath,
+        [Parameter(Mandatory)][string]$OcrPythonPath,
+        [Parameter(Mandatory)][string]$UvPath
+    )
+    $modelRoot = Join-Path $DataRootPath 'models'
+    $rerankerPath = Join-Path $modelRoot 'bge-reranker-v2-m3'
+    $ocrPath = Join-Path $modelRoot 'paddleocr-vl-1.6'
+    $rerankerPending = Join-Path $modelRoot 'bge-reranker-v2-m3.pending'
+    $ocrPending = Join-Path $modelRoot 'paddleocr-vl-1.6.pending'
+    [IO.Directory]::CreateDirectory($modelRoot) | Out-Null
+
+    if (Test-Path -LiteralPath $rerankerPath) {
+        if (-not (Test-RagSourceRerankerComplete -Path $rerankerPath)) {
+            throw "The local BGE reranker asset root is incomplete: $rerankerPath"
+        }
+        Write-RagSourcePhase "Using the existing local BGE reranker assets at $rerankerPath"
+    }
+    elseif (Test-Path -LiteralPath $rerankerPending) {
+        throw "A partial BGE reranker acquisition is present at $rerankerPending; remove only that pending folder and resume setup."
+    }
+    else {
+        Write-RagSourcePhase 'Preparing the local BGE reranker assets'
+        $resultFile = Join-Path $modelRoot 'reranker-path.txt.pending'
+        Invoke-RagSourceCommand -Program $UvPath -Arguments @(
+            '--directory',$ApiRootPath,'run','python',
+            (Join-Path $SourceRootPath 'scripts\prepare-dev-reranker.py'),
+            '--model','BAAI/bge-reranker-v2-m3',
+            '--preferred-path',$rerankerPending,
+            '--result-file',$resultFile
+        ) -FailureMessage 'The BGE reranker model could not be acquired.'
+        if (-not (Test-Path -LiteralPath $resultFile -PathType Leaf)) {
+            throw 'The BGE reranker preparation did not produce its result file.'
+        }
+        $resolved = ([IO.File]::ReadAllText($resultFile)).Trim()
+        if ([string]::IsNullOrWhiteSpace($resolved) -or
+            -not (Test-RagSourceRerankerComplete -Path $resolved)) {
+            throw 'The BGE reranker preparation returned an incomplete model path.'
+        }
+        if (-not ([IO.Path]::GetFullPath($resolved) -ceq [IO.Path]::GetFullPath($rerankerPending))) {
+            [IO.Directory]::CreateDirectory($rerankerPending) | Out-Null
+            foreach ($item in Get-ChildItem -LiteralPath $resolved -Force) {
+                Copy-Item -LiteralPath $item.FullName -Destination $rerankerPending -Recurse -Force
+            }
+        }
+        if (-not (Test-RagSourceRerankerComplete -Path $rerankerPending)) {
+            throw 'The staged BGE reranker assets are incomplete.'
+        }
+        Move-Item -LiteralPath $rerankerPending -Destination $rerankerPath
+        Remove-Item -LiteralPath $resultFile -Force -ErrorAction SilentlyContinue
+    }
+    Protect-RagPersonalPath -Path $rerankerPath -Directory
+
+    if (Test-Path -LiteralPath $ocrPath -PathType Leaf) {
+        throw "The local PaddleOCR-VL 1.6 asset path is not a directory: $ocrPath"
+    }
+    $missingOcr = if (Test-Path -LiteralPath $ocrPath -PathType Container) {
+        Get-RagSourceMissingOcrAssets -Path $ocrPath
+    }
+    else { @() }
+    if (Test-Path -LiteralPath $ocrPath -PathType Container) {
+        if (@($missingOcr).Count -gt 0) {
+            throw "The local PaddleOCR-VL 1.6 asset root is incomplete: $ocrPath (missing $($missingOcr -join ', '))"
+        }
+        Write-RagSourcePhase "Using the existing local PaddleOCR-VL 1.6 assets at $ocrPath"
+    }
+    elseif (Test-Path -LiteralPath $ocrPending) {
+        throw "A partial PaddleOCR-VL acquisition is present at $ocrPending; remove only that pending folder and resume setup."
+    }
+    else {
+        Write-RagSourcePhase 'Preparing and smoke-testing the local PaddleOCR-VL 1.6 assets'
+        [IO.Directory]::CreateDirectory($ocrPending) | Out-Null
+        $cacheRoot = Join-Path $DataRootPath 'cache\source-ocr-smoke'
+        $fixturePath = Join-Path $cacheRoot 'system-ocr-fixture.pdf'
+        $smokeOutput = Join-Path $cacheRoot 'output'
+        [IO.Directory]::CreateDirectory($cacheRoot) | Out-Null
+        $environment = @{
+            PADDLE_PDX_CACHE_HOME = $ocrPending
+            PADDLE_HOME = $ocrPending
+            OCR_MODEL_ASSET_ROOT = $ocrPending
+            HF_HUB_OFFLINE = '0'
+            TRANSFORMERS_OFFLINE = '0'
+            PYTHONNOUSERSITE = '1'
+            PYTHONUTF8 = '1'
+            PYTHONPATH = "$SourceRootPath;$ApiRootPath"
+        }
+        Invoke-RagSourceCommandWithEnvironment -Program $OcrPythonPath -Arguments @(
+            '-c',
+            'from pathlib import Path; from app.system.fixtures import system_ocr_fixture; import sys; Path(sys.argv[1]).write_bytes(system_ocr_fixture())',
+            $fixturePath
+        ) -FailureMessage 'The synthetic OCR fixture could not be generated.' -Environment $environment
+        Invoke-RagSourceCommandWithEnvironment -Program $OcrPythonPath -Arguments @(
+            '-m','paddleocr','doc_parser','-i',$fixturePath,'--save_path',$smokeOutput,
+            '--pipeline_version','v1.6','--device','cpu','--cpu_threads','1'
+        ) -FailureMessage 'PaddleOCR-VL 1.6 could not parse the synthetic fixture.' -Environment $environment
+        $missingOcr = Get-RagSourceMissingOcrAssets -Path $ocrPending
+        if (@($missingOcr).Count -gt 0) {
+            throw "PaddleOCR-VL 1.6 did not materialize required assets: $($missingOcr -join ', ')"
+        }
+        if (@(Get-ChildItem -LiteralPath $smokeOutput -Filter '*_res.json' -File -ErrorAction SilentlyContinue).Count -eq 0) {
+            throw 'PaddleOCR-VL 1.6 smoke parsing produced no result JSON.'
+        }
+        Move-Item -LiteralPath $ocrPending -Destination $ocrPath
+    }
+    Protect-RagPersonalPath -Path $ocrPath -Directory
+    return [pscustomobject]@{ reranker_path=$rerankerPath; ocr_model_path=$ocrPath }
+}
+
 if ($Plan) {
     [pscustomobject]@{
         result='pass'
@@ -103,6 +263,8 @@ if ($Plan) {
             'install locked JavaScript dependencies',
             'install locked API dependencies',
             'create the isolated pinned CPU OCR environment',
+            'prepare the exact local BGE reranker model assets',
+            'prepare and smoke-test the exact local PaddleOCR-VL 1.6 assets',
             'build and materialize the web application',
             'download and SHA-256 verify the pinned RustFS setup tool',
             'generate secrets and prepare PostgreSQL and RustFS',
@@ -111,6 +273,10 @@ if ($Plan) {
         )
         install_root=[IO.Path]::GetFullPath($InstallRoot)
         data_root=[IO.Path]::GetFullPath($DataRoot)
+        model_roots=[ordered]@{
+            reranker=(Join-Path ([IO.Path]::GetFullPath($DataRoot)) 'models\bge-reranker-v2-m3')
+            ocr=(Join-Path ([IO.Path]::GetFullPath($DataRoot)) 'models\paddleocr-vl-1.6')
+        }
         mutations_performed=$false
     } | ConvertTo-Json -Depth 4
     return
@@ -174,6 +340,9 @@ if (-not $ocrReady) {
 Invoke-RagSourceCommand -Program $ocrPython `
     -Arguments @('-c',"import paddle, paddleocr; print('PaddleOCR CPU environment ready')") `
     -FailureMessage 'The isolated OCR environment failed its import check.'
+
+$preparedModels = Prepare-RagSourceModelAssets -DataRootPath ([IO.Path]::GetFullPath($DataRoot)) `
+    -ApiRootPath $apiRoot -SourceRootPath $sourceRoot -OcrPythonPath $ocrPython -UvPath $uv.Source
 
 Write-RagSourcePhase 'Building the local web application'
 Invoke-RagSourcePnpm -Command $pnpm -Arguments @('build') `

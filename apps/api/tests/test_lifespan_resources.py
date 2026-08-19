@@ -276,7 +276,7 @@ def test_lifespan_continues_shutdown_after_stop_failures(tmp_path: Path) -> None
     asyncio.run(exercise())
 
 
-def test_only_personal_profile_starts_the_setup_surface_before_bootstrap(
+def test_setup_profiles_start_the_setup_surface_before_bootstrap(
     tmp_path: Path,
 ) -> None:
     executable = tmp_path / "python.exe"
@@ -319,6 +319,24 @@ def test_only_personal_profile_starts_the_setup_surface_before_bootstrap(
             pass
 
     asyncio.run(personal_exercise())
+
+    preview_settings = Settings(
+        product_profile="team_lan_preview_unsigned",
+        rag_lan_ipv4="192.168.40.10",
+        cors_origins=[],
+        data_root=tmp_path / "preview-data",
+        ocr_python_executable=executable,
+    )
+    preview_container = container()
+    preview_app = FastAPI(
+        lifespan=build_lifespan(preview_settings, preview_container)
+    )
+
+    async def preview_exercise() -> None:
+        async with preview_app.router.lifespan_context(preview_app):
+            pass
+
+    asyncio.run(preview_exercise())
 
     team_settings = Settings(
         data_root=tmp_path / "team-data",

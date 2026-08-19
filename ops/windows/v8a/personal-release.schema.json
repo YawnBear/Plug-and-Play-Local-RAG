@@ -19,7 +19,7 @@
     "schema_version": {"type": "integer", "const": 1},
     "manifest_id": {"type": "string", "const": "local-rag-v8a-personal"},
     "profile_id": {"type": "string", "const": "personal"},
-    "payload_state": {"type": "string", "enum": ["development_template", "packaged"]},
+    "payload_state": {"type": "string", "enum": ["development_template", "assembled_unsigned", "packaged"]},
     "expected_alembic_revision": {"type": "string", "pattern": "^[0-9]{4}_[a-z0-9_]+$"},
     "external_dependencies": {
       "type": "array",

@@ -1077,6 +1077,7 @@ class Supervisor:
         | None = None,
         listener_owner_checker: Callable[[str, int, int], bool] | None = None,
         startup_diagnostic_path: Path | None = None,
+        product_profile: str = "team_lan",
     ) -> None:
         self._services = services
         self._policy = policy
@@ -1089,6 +1090,9 @@ class Supervisor:
             listener_owner_checker or windows_tcp_listener_owned_by
         )
         self._startup_diagnostic_path = startup_diagnostic_path
+        if product_profile not in {"team_lan", "team_lan_preview_unsigned"}:
+            raise ValueError("unsupported Team/LAN runtime product profile")
+        self._product_profile = product_profile
         self._retained_processes: list[ManagedProcess] = []
 
     def run(self, deployment_id: str) -> int:
@@ -1340,20 +1344,22 @@ class Supervisor:
             self._sleeper(0.25)
         return False
 
-    @staticmethod
     def _listener_addresses(
+        self,
         service: Service,
         environment: dict[str, str],
     ) -> tuple[str, ...]:
         if service.name == "caddy" and service.listen_host == "0.0.0.0":
-            addresses = tuple(
-                environment[key]
-                for key in ("RAG_LAN_IPV4", "RAG_LAN_IPV6")
-                if environment.get(key)
+            keys = (
+                ("RAG_LAN_IPV4",)
+                if self._product_profile == "team_lan_preview_unsigned"
+                else ("RAG_LAN_IPV4", "RAG_LAN_IPV6")
             )
-            if len(addresses) != 2:
-                raise RuntimeError("Caddy requires exact IPv4 and IPv6 listener values")
-            if len(set(addresses)) != 2:
+            addresses = tuple(environment[key] for key in keys if environment.get(key))
+            if len(addresses) != len(keys):
+                required = "IPv4" if len(keys) == 1 else "IPv4 and IPv6"
+                raise RuntimeError(f"Caddy requires exact {required} listener values")
+            if len(set(addresses)) != len(addresses):
                 raise RuntimeError("Caddy LAN listener addresses must be distinct")
             try:
                 parsed = tuple(ipaddress.ip_address(address) for address in addresses)
@@ -1361,8 +1367,11 @@ class Supervisor:
                 raise RuntimeError(
                     "Caddy LAN listener values must be literal IP addresses"
                 ) from exc
-            if parsed[0].version != 4 or parsed[1].version != 6:
-                raise RuntimeError("Caddy requires IPv4 then IPv6 LAN listener values")
+            if parsed[0].version != 4 or (
+                len(parsed) == 2 and parsed[1].version != 6
+            ):
+                required = "IPv4" if len(parsed) == 1 else "IPv4 then IPv6"
+                raise RuntimeError(f"Caddy requires {required} LAN listener values")
             if any(
                 not address.is_private
                 or address.is_unspecified

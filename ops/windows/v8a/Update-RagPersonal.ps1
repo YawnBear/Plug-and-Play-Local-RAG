@@ -282,6 +282,11 @@ $journal = Read-RagPersonalJson -Path $journalPath
 Assert-RagPersonalJournal -Journal $journal
 $releaseRoot = Assert-RagPersonalPathSafe -Path ([string]$journal.release_root)
 $dataRoot = Assert-RagPersonalPathSafe -Path ([string]$journal.data_root)
+$installedContract = Read-RagPersonalJson -Path (Join-Path $root `
+    'config\personal-release.json')
+if ([string]$installedContract.payload_state -cne 'packaged') {
+    throw 'Automatic updates are unavailable for unsigned preview and source installations.'
+}
 $updateRoot = Join-Path $root 'cache\updates'
 if (-not (Test-Path -LiteralPath $updateRoot)) {
     [IO.Directory]::CreateDirectory($updateRoot) | Out-Null
@@ -399,7 +404,7 @@ if ($verified.result -cne 'verified') { throw 'The Personal update was not verif
 if ([int]$verified.release_sequence -le [int]$currentState.release_sequence) {
     throw 'No newer Personal release is available.'
 }
-$installedRelease = Read-RagPersonalJson -Path (Join-Path $root 'config\personal-release.json')
+$installedRelease = $installedContract
 $installedCompose = Join-Path $root 'config\compose.personal.yaml'
 $candidateCompose = Join-Path $verified.candidate_root 'ops\windows\v8a\compose.personal.yaml'
 if ((Get-FileHash -LiteralPath $installedCompose -Algorithm SHA256).Hash `
