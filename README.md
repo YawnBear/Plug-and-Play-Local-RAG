@@ -7,7 +7,8 @@ PaddleOCR-VL service. Documents, prompts, retrieved passages, and answers stay
 on the operator's PC or private LAN deployment.
 
 This repository is the public source distribution. Maintainers may also publish
-an optional unsigned Personal preview ZIP or a signed Personal release bundle.
+optional unsigned Personal or Team/LAN preview ZIPs, or a signed Personal
+release bundle.
 
 **[Open the interactive frontend preview](https://yawnbear.github.io/Plug-and-Play-Local-RAG/)**
 
@@ -34,27 +35,37 @@ newer preview manually when one is published.
 
 ### Unsigned Team/LAN preview
 
+> **Qualification status:** The unsigned Team/LAN preview has passed source,
+> package, and automated contract validation, but it has not completed the
+> required live clean-machine and two-device Windows qualification. Treat it as
+> review and testing software until clean installation, restart and persistence,
+> preserve-data reinstall, connector, authorization and citation, network
+> isolation, and migration rollback evidence is complete.
+
 Maintainers may also publish `Local-RAG-Team-LAN-Preview.zip` for a small
 trusted LAN. On the attended Windows 10/11 host, install and start Docker
 Desktop and Ollama, extract the ZIP, and run `Install-Local-RAG-LAN.cmd` as an
 administrator. The installer accepts exactly one reserved RFC1918 IPv4 address
 and exposes only `https://rag.home.arpa:443`; all application services remain
-on loopback and the API uses mTLS behind Caddy.
+on loopback and the API uses mTLS behind Caddy. The ZIP includes the application
+runtimes and maintenance tools, so host-side Python, Node.js, `uv`, `psql`, and
+`mc` are not required.
 
 The attended LAN workflow is:
 
-1. Reserve the host's current private IPv4 address in the router or DHCP
-   server, then enter that address in the host installer.
+1. Put the host's active physical network adapter on a Private network profile,
+   reserve its current private IPv4 address in the router or DHCP server, then
+   enter that address in the host installer.
 2. Copy the displayed owner setup code into the page the installer opens and
    create the first owner account.
 3. Retrieve
    `C:\ProgramData\LocalRAG\connectors\generation-1\Local-RAG-LAN-Connector.zip`
    from the host, distribute that ZIP to each trusted client, and communicate
    its displayed CA SHA-256 fingerprint over a separate trusted channel.
-4. On each client, run `Connect-to-Local-RAG.cmd` once, approve UAC, enter
-   the independently received fingerprint, and let the connector verify HTTPS
-   before it opens the application. The connector contains no private key or
-   account credential.
+4. On each trusted Windows 10/11 client, run `Connect-to-Local-RAG.cmd` once,
+   approve UAC, enter the independently received fingerprint, and let the
+   connector verify HTTPS before it opens the application. The connector
+   contains no private key or account credential.
 5. To remove a client, run `Disconnect-from-Local-RAG.cmd` from the same
    connector. It removes only the exact managed certificate and hosts state.
 6. Create users, teams, and folder permissions from the application's owner
@@ -62,16 +73,15 @@ The attended LAN workflow is:
 
 This preview is explicitly `unverified_unsigned`; Windows may warn about it,
 and automatic updates are unavailable. `Update-Local-RAG-LAN.cmd` is an
-attended manual release transaction with bounded Alembic migrations. It requires an
-administrator-selected backup folder outside the Local RAG program and data
-roots, and it will proceed only after an isolated restore verifies the database
-and exact object inventory. Keep the retained verified backup after updating.
-`Repair-Local-RAG-LAN.cmd` transactionally changes the host IPv4, Caddy
-and API environments, firewall rule, hosts ledger, and connector bundle. After
-repair, distribute the newly numbered connector generation; running its
+attended manual release transaction with bounded Alembic migrations. It
+requires an administrator-selected backup folder outside the Local RAG program
+and data roots, and it will proceed only after an isolated restore verifies the
+database and exact object inventory. Keep the retained verified backup after
+updating. `Repair-Local-RAG-LAN.cmd` transactionally changes the host IPv4,
+Caddy and API environments, firewall rule, hosts ledger, and connector bundle.
+After repair, distribute the newly numbered connector generation; running its
 `Connect-to-Local-RAG.cmd` atomically replaces the older managed client state.
-The
-preview and signed Team installation states are mutually exclusive. Router
+The preview and signed Team installation states are mutually exclusive. Router
 port forwarding, public addresses, Public network profiles, and public-Internet
 deployment are not supported.
 
@@ -270,7 +280,10 @@ pnpm.cmd validate
 
 This checks lint, launcher tests, API tests, web tests, TypeScript, and the
 production web build. Hardware-dependent model, OCR, browser, backup, and
-restore tests remain separate.
+restore tests remain separate. Pull requests to `main` also run the public
+source gate, which checks source contracts and the SBOM, parses Windows entry
+points, exercises the supervisor and installer contracts, enforces the
+open-source policy, reviews dependency changes, and runs CodeQL.
 
 ## Main functions
 
